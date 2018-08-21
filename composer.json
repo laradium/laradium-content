@@ -1,0 +1,23 @@
+{
+  "name": "netcore/aven-content",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Daniels Grietins",
+      "email": "daniels.grietins@netcore.lv"
+    }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Netcore\\Aven\\Content\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Netcore\\Aven\\Content\\Providers\\AvenContentServiceProvider"
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<?php
+
+namespace {{namespace}}\Aven\Channels;
+
+use Netcore\Aven\Aven\FieldSet;
+use App\Aven\Page;
+use {{channelNamespace}}\{{page}};
+
+Class {{page}}Channel
+{
+
+    /**
+     * @param FieldSet $set
+     */
+    public function fields(FieldSet $set)
+    {
+        $set->morphsTo({{page}}::class, Page::class)->fields(function (FieldSet $set) {
+            $set->text('author');
+            $set->wysiwyg('content')->translatable();
+        })->morphName('content');
+
+        $set->widgetConstructor();
+    }
+}

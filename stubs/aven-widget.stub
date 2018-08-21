@@ -1,0 +1,27 @@
+<?php
+
+namespace {{namespace}}\Aven\Channels;
+
+use Netcore\Aven\Aven\AbstractAvenResource;
+use Netcore\Aven\Aven\FieldSet;
+use Netcore\Aven\Aven\Page;
+use {{namespace}}\{{page}}Channel;
+
+Class {{page}}Channel extends AbstractAvenResource
+{
+
+    /**
+     * @var string
+     */
+    protected $resource = {{page}}::class;
+
+    /**
+     * @return \Netcore\Aven\Aven\Page
+     */
+    public function resource()
+    {
+        return (new Page)->make(function (FieldSet $set) {
+            $set->text('type')->rules('required|min:3');
+        });
+    }
+}
