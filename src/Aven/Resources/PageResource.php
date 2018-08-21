@@ -103,6 +103,6 @@ Class PageResource extends AbstractAvenResource
         })
             ->actions(['edit', 'delete'])
             ->relations(['translations'])
-            ->additionalView('aven::admin.pages.index-top', compact('channels'));
+            ->additionalView('aven-content::admin.pages.index-top', compact('channels'));
     }
 }
