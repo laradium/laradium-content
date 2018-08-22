@@ -22,6 +22,7 @@ class AvenContentServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'aven-content');
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/admin.php');
 
         if ($this->app->runningInConsole()) {
             $this->commands([

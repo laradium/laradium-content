@@ -12,15 +12,50 @@ use Netcore\Aven\Aven\FieldSet;
 class WidgetConstructor extends Field
 {
 
+    /**
+     * @var string
+     */
     protected $relationName;
+
+    /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
     protected $widgetRegistry;
+
+    /**
+     * @var
+     */
     protected $fieldGroups;
+
+    /**
+     * @var string
+     */
     protected $morphName;
+
+    /**
+     * @var string
+     */
     protected $morphClass;
+
+    /**
+     * @var string
+     */
     protected $morphAttributeName;
+    /**
+     * @var string
+     */
     protected $sortableColumn;
+
+    /**
+     * @var bool
+     */
     protected $isSortable;
 
+    /**
+     * WidgetConstructor constructor.
+     * @param $parameters
+     * @param Model $model
+     */
     public function __construct($parameters, Model $model)
     {
         parent::__construct($parameters, $model);
@@ -33,6 +68,11 @@ class WidgetConstructor extends Field
 
     }
 
+    /**
+     * @param array $parentAttributeList
+     * @param null $model
+     * @return $this|Field
+     */
     public function build($parentAttributeList = [], $model = null)
     {
         $this->parentAttributeList = $parentAttributeList;
@@ -85,6 +125,11 @@ class WidgetConstructor extends Field
         return $this;
     }
 
+    /**
+     * @param $model
+     * @param $attributeList
+     * @return Hidden
+     */
     public function createSortableField($model, $attributeList)
     {
         $field = new Hidden($this->sortableColumn, $model);
@@ -97,6 +142,11 @@ class WidgetConstructor extends Field
         return $field;
     }
 
+    /**
+     * @param $morphClass
+     * @param $attributeList
+     * @return Hidden
+     */
     public function createContentTypeField($morphClass, $attributeList)
     {
         $field = new Hidden('morph_type', $this->model);
@@ -106,6 +156,11 @@ class WidgetConstructor extends Field
         return $field;
     }
 
+    /**
+     * @param $morphClass
+     * @param $attributeList
+     * @return Hidden
+     */
     public function createMorphNameField($morphClass, $attributeList)
     {
         $field = new Hidden('morph_name', $this->model);
@@ -115,6 +170,11 @@ class WidgetConstructor extends Field
         return $field;
     }
 
+    /**
+     * @param $model
+     * @param $attributeList
+     * @return Hidden
+     */
     public function createIdField($model, $attributeList)
     {
         $field = new Hidden('id', $model);
@@ -123,6 +183,9 @@ class WidgetConstructor extends Field
         return $field;
     }
 
+    /**
+     * @return array
+     */
     public function template()
     {
         $widgets = $this->widgetRegistry->all()->map(function ($item) {
@@ -185,6 +248,10 @@ class WidgetConstructor extends Field
         ]);
     }
 
+    /**
+     * @param null $field
+     * @return array
+     */
     public function formatedResponse($field = null)
     {
         $items = [];
@@ -225,6 +292,9 @@ class WidgetConstructor extends Field
         return $this->model()->load($this->relationName)->{$this->relationName}();
     }
 
+    /**
+     * @return bool
+     */
     public function isSortable()
     {
         return $this->isSortable;
