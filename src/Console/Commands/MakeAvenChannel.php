@@ -50,6 +50,7 @@ class MakeAvenChannel extends Command
         $channel = str_replace('{{namespace}}', $namespace, $dummyChannel);
         $channel = str_replace('{{page}}', $name, $channel);
         $channel = str_replace('{{channelNamespace}}', config('aven-content.default_channels_models_directory', 'App'), $channel);
+
         $channelFilePath = app_path('Aven/Channels/' . $name . 'Channel.php');
 
         if (file_exists($channelFilePath)) {
