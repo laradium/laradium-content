@@ -39,6 +39,7 @@ class MakeAvenWidget extends Command
      */
     public function handle()
     {
+
         $name = $this->argument('name');
         $translations = $this->option('t');
         $namespace = str_replace('\\', '', app()->getNamespace());
