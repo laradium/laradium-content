@@ -7,14 +7,14 @@ Route::group([
     'middleware' => ['web', 'aven'],
 ], function () {
     Route::delete('content-block/{id}', [
-        '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@contentBlockDelete'
+        'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@contentBlockDelete'
     ]);
 
     Route::get('pages/create/{channel}', [
-        '\Netcore\Aven\Content\Aven\Resources\PageResource@create'
+        'uses' => '\Netcore\Aven\Content\Aven\Resources\PageResource@create'
     ]);
 
     Route::get('pages/{page}/edit', [
-        '\Netcore\Aven\Content\Aven\Resources\PageResource@edit'
+        'uses' => '\Netcore\Aven\Content\Aven\Resources\PageResource@edit'
     ]);
 });
