@@ -1,9 +1,10 @@
-##Content module for Aven cms
+#Content module for Aven cms
 
-###Installation
+#Installation
 
 1. Add this to your project repositories list in `composer.json` file
-```$xslt
+
+```
 "repositories": [
     {
       "type": "path",
@@ -17,7 +18,8 @@
 ```
 
 Directory structure should look like this
-```$xslt
+
+```
 -Project
 -packages
 --aven-package
@@ -28,24 +30,26 @@ Directory structure should look like this
 3. ```php artisan vendor:publish --tag=aven-content```
 4. Configure `config/aven.php` file with your preferences
 5. Add widgetConstructor field to you `aven.php` field list
-```$xslt
+```
 'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
 ```
 
-###Usage
+# Usage
 By default there comes Main channel with widget constructor, which allows you to create sortable widget blocks for your needs.
 
-## Creating new channels
-1. Run this command
+# Creating new channels
+1. Run this command (_It automatically creates model for you You can pass `--t` argument to also create translations model_)
+
 ```
 php artisan aven:channel Blog
 ```
+
 
 It will create new Channel under `App\Aven\Channels`
 
 It should look like this
 
-```$xslt
+```
 <?php
 
 namespace App\Aven\Channels;
@@ -76,32 +80,46 @@ You need to create model for Blog channel where you can specify all your needed 
 
 2. You need to add created channels to `ocnfig/aven-content.php` file in order to be able actually see them.
 
-### Creating widgets
+# Creating widgets
 
-To create new widget create new widget file under `App\Aven\Widgets` with contents
+1. Run this command `php artisan aven:widget` (_It automatically creates model for you You can pass `--t` argument to also create translations model_)
 
-```$xslt
+
+It creates a widget under `App\Aven\Widgets`
+```
 <?php
 
 namespace App\Aven\Widgets;
 
+use App\Models\Widgets\Hiw;
 use Netcore\Aven\Aven\FieldSet;
+use Netcore\Aven\Content\Aven\AbstractWidget;
 
-class HeroWidget
+class HiwWidget extends AbstractWidget
 {
 
-    protected $model = \App\Models\Widgets\HeroWidget::class;
+    /**
+     * @var string
+     */
+    protected $model = Hiw::class;
 
+    /**
+     * @var string
+     */
+    protected $view = 'widgets.HiwWidget';
+
+    /**
+     * @param FieldSet $set
+     * @return mixed|void
+     */
     public function fields(FieldSet $set)
     {
-        $set->text('key');
         $set->text('title')->translatable();
         $set->text('description')->translatable();
-    }
-
-    public function model()
-    {
-        return $this->model;
+        $set->hasMany('items')->fields(function (FieldSet $set) {
+            $set->text('title')->translatable();
+            $set->text('description')->translatable();
+        })->sortable('sequence_no');
     }
 }
 ```
