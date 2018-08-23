@@ -7,15 +7,27 @@
 "repositories": [
     {
       "type": "path",
+      "url": "../packages/aven-package"
+    },
+    {
+      "type": "path",
       "url": "../packages/aven-content"
     }
   ]
 ```
 
+Directory structure should look like this
+```$xslt
+-Project
+-packages
+--aven-package
+--aven-content
+```
+
 2. ```composer require netcore/aven-content dev-master```
 3. ```php artisan vendor:publish --tag=aven-content```
 4. Configure `config/aven.php` file with your preferences
-5. Add widgetConstructor field to you ave.php field list
+5. Add widgetConstructor field to you `aven.php` field list
 ```$xslt
 'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
 ```
@@ -25,7 +37,7 @@ By default there comes Main channel with widget constructor, which allows you to
 
 ## Creating new channels
 1. Run this command
-```$xslt
+```
 php artisan aven:channel Blog
 ```
 
