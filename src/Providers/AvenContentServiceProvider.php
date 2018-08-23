@@ -4,6 +4,7 @@ namespace Netcore\Aven\Content\Providers;
 
 use Netcore\Aven\Content\Console\Commands\MakeAvenChannel;
 use Illuminate\Support\ServiceProvider;
+use Netcore\Aven\Content\Console\Commands\MakeAvenWidget;
 use Netcore\Aven\Content\Registries\ChannelRegistry;
 use Netcore\Aven\Content\Registries\WidgetRegistry;
 
@@ -27,6 +28,7 @@ class AvenContentServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeAvenChannel::class,
+                MakeAvenWidget::class,
             ]);
         }
     }

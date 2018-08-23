@@ -2,26 +2,34 @@
 
 namespace {{namespace}}\Aven\Channels;
 
-use Netcore\Aven\Aven\AbstractAvenResource;
 use Netcore\Aven\Aven\FieldSet;
-use Netcore\Aven\Aven\Page;
-use {{namespace}}\{{page}}Channel;
+use Netcore\Aven\Content\Aven\AbstractWidget;
+use {{widgetNamespace}}\{{widget}};
 
-Class {{page}}Channel extends AbstractAvenResource
+class {{widget}}Widget extends AbstractWidget
 {
 
     /**
      * @var string
      */
-    protected $resource = {{page}}::class;
+    protected $model = {{widget}}::class;
 
     /**
-     * @return \Netcore\Aven\Aven\Page
+     * @var string
      */
-    public function resource()
+    protected $view = 'widgets.{{widget}}';
+
+    /**
+     * @param FieldSet $set
+     * @return mixed|void
+     */
+    public function fields(FieldSet $set)
     {
-        return (new Page)->make(function (FieldSet $set) {
-            $set->text('type')->rules('required|min:3');
-        });
+        $set->text('title')->translatable();
+        $set->text('description')->translatable();
+        $set->hasMany('items')->fields(function (FieldSet $set) {
+            $set->text('title')->translatable();
+            $set->text('description')->translatable();
+        })->sortable('sequence_no');
     }
 }
