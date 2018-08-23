@@ -2,6 +2,7 @@
 
 namespace Netcore\Aven\Content\Console\Commands;
 
+use Artisan;
 use Illuminate\Console\Command;
 use File;
 
@@ -12,7 +13,7 @@ class MakeAvenChannel extends Command
      *
      * @var string
      */
-    protected $signature = 'aven:channel  {name}';
+    protected $signature = 'aven:channel {name} {--t}';
 
     /**
      * The console command description.
@@ -39,6 +40,7 @@ class MakeAvenChannel extends Command
     public function handle()
     {
         $name = $this->argument('name');
+        $translations = $this->option('t');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
         $channelDirectory = app_path('Aven/Channels');
@@ -46,21 +48,24 @@ class MakeAvenChannel extends Command
             File::makeDirectory($channelDirectory, 0755, true);
             $this->info('Creating channels directory');
         }
-        $dummyChannel = File::get(__DIR__.'/../../../stubs/aven-channel.stub');
+
+        $dummyChannel = File::get(__DIR__ . '/../../../stubs/aven-channel.stub');
         $channel = str_replace('{{namespace}}', $namespace, $dummyChannel);
         $channel = str_replace('{{page}}', $name, $channel);
         $channel = str_replace('{{channelNamespace}}', config('aven-content.default_channels_models_directory', 'App'), $channel);
 
         $channelFilePath = app_path('Aven/Channels/' . $name . 'Channel.php');
 
-        if (file_exists($channelFilePath)) {
-            $this->error('Channel already exists!');
-
-            return;
-        } else {
+        if (!file_exists($channelFilePath)) {
             File::put($channelFilePath, $channel);
-            $this->info('Channel successfully created!');
         }
+
+        Artisan::call('make:model', ['name' => 'Models/Channels/' . $name]);
+        if ($translations) {
+            Artisan::call('make:model', ['name' => 'Models/Channels/Translations/' . $name . 'Translation']);
+        }
+
+        $this->info('Channel successfully created!');
 
         return;
     }

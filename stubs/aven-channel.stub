@@ -6,7 +6,7 @@ use Netcore\Aven\Aven\FieldSet;
 use App\Aven\Page;
 use {{channelNamespace}}\{{page}};
 
-Class {{page}}Channel
+class {{page}}Channel
 {
 
     /**
