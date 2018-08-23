@@ -1,6 +1,6 @@
-#Content module for Aven cms
+# Content module for Aven cms
 
-#Installation
+# Installation
 
 1. Add this to your project repositories list in `composer.json` file
 
