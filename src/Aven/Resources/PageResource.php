@@ -31,11 +31,11 @@ Class PageResource extends AbstractAvenResource
             $channel = $channelRegistry->getChannelByName($channelName);
             $channelInstance = new $channel;
 
-            $set->boolean('is_active');
-
-
             $set->text('title')->translatable();
             $set->text('slug')->translatable();
+
+            $set->boolean('is_active');
+            $set->boolean('is_homepage');
 
             $set->tab('Meta')->fields(function (FieldSet $set) {
                 $set->text('meta_keywords')->translatable();

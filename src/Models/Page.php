@@ -5,6 +5,7 @@ namespace Netcore\Aven\Content\Models;
 use Netcore\Aven\Content\Models\Translations\PageTranslation;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Netcore\Aven\Content\Registries\WidgetRegistry;
 
 class Page extends Model
 {
@@ -15,7 +16,8 @@ class Page extends Model
      * @var array
      */
     protected $fillable = [
-        'is_active'
+        'is_active',
+        'is_homepage',
     ];
 
     /**
@@ -54,5 +56,27 @@ class Page extends Model
     public function blocks()
     {
         return $this->hasMany(ContentBlock::class);
+    }
+
+    /**
+     * @return array
+     */
+    public function widgets()
+    {
+        $widgetRegistry = app(WidgetRegistry::class);
+        $widgets = $widgetRegistry->all()->mapWithKeys(function ($widget) {
+            return array_flip($widget);
+        })->toArray();
+
+        $widgetList = [];
+        foreach ($this->blocks as $block) {
+            $widget = $widgets[$block->block_type];
+            $widget = new $widget;
+            $widgetList[] = view($widget->view(), [
+                'widget' => $block->block
+            ]);
+        }
+
+        return $widgetList;
     }
 }

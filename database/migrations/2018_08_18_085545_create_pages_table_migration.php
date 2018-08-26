@@ -16,6 +16,7 @@ class CreatePagesTableMigration extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->increments('id');
             $table->boolean('is_active')->default(0);
+            $table->boolean('is_homepage')->default(0);
             $table->string('content_type')->nullable();
             $table->integer('content_id')->nullable();
             $table->timestamps();

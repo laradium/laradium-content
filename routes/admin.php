@@ -18,3 +18,7 @@ Route::group([
         'uses' => '\Netcore\Aven\Content\Aven\Resources\PageResource@edit'
     ]);
 });
+
+Route::get('/{slug?}', [
+    'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@resolve'
+])->middleware('web');

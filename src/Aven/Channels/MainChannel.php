@@ -8,6 +8,11 @@ Class MainChannel
 {
 
     /**
+     * @var string
+     */
+    public $layout = 'layouts.main';
+
+    /**
      * @param FieldSet $set
      */
     public function fields(FieldSet $set)
