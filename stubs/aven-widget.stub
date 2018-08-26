@@ -1,6 +1,6 @@
 <?php
 
-namespace {{namespace}}\Aven\Channels;
+namespace {{namespace}}\Aven\Widgets;
 
 use Netcore\Aven\Aven\FieldSet;
 use Netcore\Aven\Content\Aven\AbstractWidget;

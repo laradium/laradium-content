@@ -18,9 +18,19 @@ abstract class AbstractWidget
     /**
      * @return string
      */
-    public function view()
+    public function view(): string
     {
         return $this->view;
+    }
+
+    /**
+     * @param  $widget
+     * @return string
+     * @throws \Throwable
+     */
+    public function render($widget): string
+    {
+        return view($this->view(), compact('widget'))->render();
     }
 
     /**
