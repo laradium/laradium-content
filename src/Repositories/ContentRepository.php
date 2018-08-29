@@ -73,7 +73,7 @@ class ContentRepository
     {
         foreach ($relations as $relation => $items) {
             foreach ($items as $item) {
-                $relationModel = $model->{$relation}()->create(array_except($item, ['translations', 'file']));
+                $relationModel = $model->{$relation}()->create(array_except($item, ['translations', 'file', 'relations']));
 
                 if (isset($item['file'])) {
                     $this->putFiles($relationModel, $item['file']);
