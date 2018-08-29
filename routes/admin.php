@@ -19,6 +19,6 @@ Route::group([
     ]);
 });
 
-Route::get('/{slug?}', [
-    'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@resolve'
-])->middleware('web');
+//Route::get('/{slug?}', [
+//    'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@resolve'
+//])->middleware('web');

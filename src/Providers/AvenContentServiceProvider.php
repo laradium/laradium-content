@@ -31,6 +31,9 @@ class AvenContentServiceProvider extends ServiceProvider
                 MakeAvenWidget::class,
             ]);
         }
+
+        // Global helpers
+        require_once __DIR__ . '/../Helpers/Global.php';
     }
 
     /**

@@ -238,6 +238,7 @@ class WidgetConstructor extends Field
             }
 
             $templates[$widgetName]['id'] = 0;
+            $templates[$widgetName]['show'] = false;
             $templates[$widgetName]['order'] = 0;
             $templates[$widgetName]['replacementIds'] = [];
         }
@@ -260,6 +261,7 @@ class WidgetConstructor extends Field
                 'id'             => $id,
                 'name'           => $group['name'],
                 'replacementIds' => [],
+                'show'           => false,
                 'isSortable'     => $this->isSortable(),
                 'url'            => '/admin/content-block/' . $id
             ];
