@@ -77,6 +77,7 @@ class WidgetConstructor extends Field
     {
         $this->parentAttributeList = $parentAttributeList;
         $fieldList = [];
+        $rules = [];
         $items = $this->relation()->orderBy('sequence_no')->get();
         foreach ($items as $item) {
             $widgetClass = $this->widgetRegistry->getByModel($item->block_type);
@@ -106,6 +107,8 @@ class WidgetConstructor extends Field
                 $clonedField->build($morphAttributeList, $model);
 
                 $fieldList[$item->id]['fields'][] = $clonedField;
+                $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+
             }
 
             $fieldList[$item->id]['fields'][] = $this->createContentTypeField($this->morphClass, $morphAttributeList);
@@ -119,7 +122,9 @@ class WidgetConstructor extends Field
             $fieldList[$item->id]['name'] = 'Widget - ' . str_singular(ucfirst(str_replace('_', ' ',
                     $model->getTable())));
         }
-
+        if ($rules) {
+            $this->validationRules = $rules;
+        }
         $this->fieldGroups = $fieldList;
 
         return $this;
