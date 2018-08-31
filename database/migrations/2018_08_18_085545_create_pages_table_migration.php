@@ -19,6 +19,13 @@ class CreatePagesTableMigration extends Migration
             $table->boolean('is_homepage')->default(0);
             $table->string('content_type')->nullable();
             $table->integer('content_id')->nullable();
+
+
+            $table->string('meta_image_file_name')->nullable();
+            $table->integer('meta_image_file_size')->nullable();
+            $table->string('meta_image_content_type')->nullable();
+            $table->timestamp('meta_image_updated_at')->nullable();
+
             $table->timestamps();
         });
 
@@ -31,7 +38,6 @@ class CreatePagesTableMigration extends Migration
             $table->text('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_url')->nullable();
-            $table->text('meta_image')->nullable();
 
             $table->string('locale')->nullable()->index();
 

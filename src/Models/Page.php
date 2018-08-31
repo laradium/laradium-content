@@ -5,12 +5,23 @@ namespace Netcore\Aven\Content\Models;
 use Netcore\Aven\Content\Models\Translations\PageTranslation;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Czim\Paperclip\Model\PaperclipTrait;
 use Netcore\Aven\Content\Registries\WidgetRegistry;
+use Netcore\Aven\Content\Traits\PaperclipAndTranslatable;
 
-class Page extends Model
+class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
+    use PaperclipTrait, PaperclipAndTranslatable;
 
-    use Translatable;
+    use Translatable {
+        PaperclipAndTranslatable::getAttribute insteadof Translatable;
+        PaperclipAndTranslatable::setAttribute insteadof Translatable;
+    }
+
+    use PaperclipTrait {
+        PaperclipAndTranslatable::getAttribute insteadof PaperclipTrait;
+        PaperclipAndTranslatable::setAttribute insteadof PaperclipTrait;
+    }
 
     /**
      * @var array
@@ -18,6 +29,7 @@ class Page extends Model
     protected $fillable = [
         'is_active',
         'is_homepage',
+        'meta_image',
     ];
 
     /**
@@ -37,10 +49,14 @@ class Page extends Model
         'meta_title',
         'meta_description',
         'meta_url',
-        'meta_image',
 
         'page'
     ];
+
+    public function __construct()
+    {
+        $this->hasAttachedFile('meta_image', []);
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo

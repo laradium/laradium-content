@@ -42,7 +42,7 @@ Class PageResource extends AbstractAvenResource
                 $set->text('meta_title')->translatable();
                 $set->text('meta_description')->translatable();
                 $set->text('meta_url')->translatable();
-                $set->text('meta_image')->translatable();
+                $set->file('meta_image')->rules('max:' . config('aven.file_size', 2024));
             });
 
             $channelInstance->fields($set);
