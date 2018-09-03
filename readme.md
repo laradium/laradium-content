@@ -2,6 +2,8 @@
 
 # Installation
 
+## For local use
+
 1. Add this to your project repositories list in `composer.json` file
 
 ```
@@ -24,6 +26,21 @@ Directory structure should look like this
 -packages
 --aven-package
 --aven-content
+```
+
+## For global use
+
+```
+"repositories": [
+        {
+            "type": "git",
+            "url": "https://git.netcore.lv/daniels.grietins/aven"
+        },
+        {
+            "type": "git",
+            "url": "https://git.netcore.lv/daniels.grietins/aven-content"
+        }
+    ]
 ```
 
 2. ```composer require netcore/aven-content dev-master```
