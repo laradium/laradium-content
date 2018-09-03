@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Content\Models\Translations;
+namespace Laradium\Laradium\Content\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 

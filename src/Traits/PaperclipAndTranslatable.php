@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Content\Traits;
+namespace Laradium\Laradium\Content\Traits;
 
 use Czim\FileHandling\Contracts\Storage\StorableFileFactoryInterface;
 use Czim\Paperclip\Attachment\Attachment;

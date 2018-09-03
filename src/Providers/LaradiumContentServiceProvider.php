@@ -1,34 +1,34 @@
 <?php
 
-namespace Netcore\Aven\Content\Providers;
+namespace Laradium\Laradium\Content\Providers;
 
-use Netcore\Aven\Content\Console\Commands\MakeAvenChannel;
+use Laradium\Laradium\Content\Console\Commands\MakeLaradiumChannel;
 use Illuminate\Support\ServiceProvider;
-use Netcore\Aven\Content\Console\Commands\MakeAvenWidget;
-use Netcore\Aven\Content\Registries\ChannelRegistry;
-use Netcore\Aven\Content\Registries\WidgetRegistry;
+use Laradium\Laradium\Content\Console\Commands\MakeLaradiumWidget;
+use Laradium\Laradium\Content\Registries\ChannelRegistry;
+use Laradium\Laradium\Content\Registries\WidgetRegistry;
 
-class AvenContentServiceProvider extends ServiceProvider
+class LaradiumContentServiceProvider extends ServiceProvider
 {
 
     public function boot()
     {
 
-        $configPath = __DIR__ . '/../../config/aven-content.php';
-        $this->mergeConfigFrom($configPath, 'aven-content');
+        $configPath = __DIR__ . '/../../config/laradium-content.php';
+        $this->mergeConfigFrom($configPath, 'laradium-content');
 
         $this->publishes([
-            $configPath => config_path('aven-content.php'),
-        ], 'aven-content');
+            $configPath => config_path('laradium-content.php'),
+        ], 'laradium-content');
 
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'aven-content');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium-content');
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/../../routes/admin.php');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                MakeAvenChannel::class,
-                MakeAvenWidget::class,
+                MakeLaradiumChannel::class,
+                MakeLaradiumWidget::class,
             ]);
         }
 
@@ -46,7 +46,7 @@ class AvenContentServiceProvider extends ServiceProvider
         $this->app->singleton(ChannelRegistry::class, function () {
             $registry = new ChannelRegistry();
 
-            foreach (config('aven-content.channels', []) as  $channel) {
+            foreach (config('laradium-content.channels', []) as  $channel) {
                 $registry->register($channel);
             }
 
@@ -56,7 +56,7 @@ class AvenContentServiceProvider extends ServiceProvider
         $this->app->singleton(WidgetRegistry::class, function () {
             $registry = new WidgetRegistry();
 
-            foreach (config('aven-content.widgets', []) as  $channel) {
+            foreach (config('laradium-content.widgets', []) as  $channel) {
                 $registry->register($channel);
             }
 

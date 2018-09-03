@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Content\Repositories;
+namespace Laradium\Laradium\Content\Repositories;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -13,7 +13,7 @@ class ContentRepository
     public function put($pages)
     {
         foreach ($pages as $page) {
-            $p = \Netcore\Aven\Content\Models\Page::create(array_except($page, ['translations', 'data']));
+            $p = \Laradium\Laradium\Content\Models\Page::create(array_except($page, ['translations', 'data']));
             foreach (translate()->languages() as $lang) {
                 $page['translations']['locale'] = $lang['iso_code'];
                 $p->translations()->firstOrCreate($page['translations']);

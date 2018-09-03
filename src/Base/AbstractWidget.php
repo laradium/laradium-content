@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Content\Aven;
+namespace Laradium\Laradium\Content\Laradium;
 
-use Netcore\Aven\Aven\FieldSet;
+use Laradium\Laradium\Base\FieldSet;
 
 abstract class AbstractWidget
 {

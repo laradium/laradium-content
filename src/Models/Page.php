@@ -1,13 +1,13 @@
 <?php
 
-namespace Netcore\Aven\Content\Models;
+namespace Laradium\Laradium\Content\Models;
 
-use Netcore\Aven\Content\Models\Translations\PageTranslation;
+use Laradium\Laradium\Content\Models\Translations\PageTranslation;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Czim\Paperclip\Model\PaperclipTrait;
-use Netcore\Aven\Content\Registries\WidgetRegistry;
-use Netcore\Aven\Content\Traits\PaperclipAndTranslatable;
+use Laradium\Laradium\Content\Registries\WidgetRegistry;
+use Laradium\Laradium\Content\Traits\PaperclipAndTranslatable;
 
 class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {

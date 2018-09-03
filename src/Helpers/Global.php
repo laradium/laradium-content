@@ -6,6 +6,6 @@ if (!function_exists('content')) {
      */
     function content()
     {
-        return app(\Netcore\Aven\Content\Repositories\ContentRepository::class);
+        return app(\Laradium\Laradium\Content\Repositories\ContentRepository::class);
     }
 }

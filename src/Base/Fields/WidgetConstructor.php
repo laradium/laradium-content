@@ -1,13 +1,13 @@
 <?php
 
-namespace Netcore\Aven\Content\Aven\Fields;
+namespace Laradium\Laradium\Content\Base\Fields;
 
 
-use Netcore\Aven\Content\Registries\WidgetRegistry;
+use Laradium\Laradium\Content\Registries\WidgetRegistry;
 use Illuminate\Database\Eloquent\Model;
-use Netcore\Aven\Aven\Field;
-use Netcore\Aven\Aven\Fields\Hidden;
-use Netcore\Aven\Aven\FieldSet;
+use Laradium\Laradium\Base\Field;
+use Laradium\Laradium\Base\Fields\Hidden;
+use Laradium\Laradium\Base\FieldSet;
 
 class WidgetConstructor extends Field
 {

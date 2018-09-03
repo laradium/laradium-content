@@ -1,9 +1,9 @@
 <?php
 
-namespace {{namespace}}\Aven\Channels;
+namespace {{namespace}}\Laradium\Channels;
 
-use Netcore\Aven\Aven\FieldSet;
-use App\Aven\Page;
+use Laradium\Laradium\Base\FieldSet;
+use App\Laradium\Page;
 use {{channelNamespace}}\{{page}};
 
 class {{page}}Channel

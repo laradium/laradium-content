@@ -6,11 +6,11 @@ return [
     'default_channels_models_directory' => 'App\\Models\\Channels',
 
     'channels' => [
-        \Netcore\Aven\Content\Aven\Channels\MainChannel::class,
-//        \App\Aven\Channels\BlogChannel::class,
+        \Laradium\Laradium\Content\Laradium\Channels\MainChannel::class,
+//        \App\Laradium\Channels\BlogChannel::class,
     ],
 
     'widgets' => [
-//        \App\Aven\Widgets\HiwWidget::class,
+//        \App\Laradium\Widgets\HiwWidget::class,
     ],
 ];

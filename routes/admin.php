@@ -4,21 +4,21 @@ Route::group([
     'prefix'     => 'admin',
     'as'         => 'admin.',
     'namespace'  => 'Admin',
-    'middleware' => ['web', 'aven'],
+    'middleware' => ['web', 'laradium'],
 ], function () {
     Route::delete('content-block/{id}', [
-        'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@contentBlockDelete'
+        'uses' => '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@contentBlockDelete'
     ]);
 
     Route::get('pages/create/{channel}', [
-        'uses' => '\Netcore\Aven\Content\Aven\Resources\PageResource@create'
+        'uses' => '\Laradium\Laradium\Content\Laradium\Resources\PageResource@create'
     ]);
 
     Route::get('pages/{page}/edit', [
-        'uses' => '\Netcore\Aven\Content\Aven\Resources\PageResource@edit'
+        'uses' => '\Laradium\Laradium\Content\Laradium\Resources\PageResource@edit'
     ]);
 });
 
 //Route::get('/{slug?}', [
-//    'uses' => '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@resolve'
+//    'uses' => '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@resolve'
 //])->middleware('web');

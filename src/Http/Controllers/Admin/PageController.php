@@ -1,12 +1,12 @@
 <?php
 
-namespace Netcore\Aven\Content\Http\Controllers\Admin;
+namespace Laradium\Laradium\Content\Http\Controllers\Admin;
 
-use Netcore\Aven\Content\Aven\Channels\MainChannel;
-use Netcore\Aven\Content\Models\ContentBlock;
+use Laradium\Laradium\Content\Laradium\Channels\MainChannel;
+use Laradium\Laradium\Content\Models\ContentBlock;
 use Illuminate\Http\Request;
-use Netcore\Aven\Content\Models\Page;
-use Netcore\Aven\Content\Registries\WidgetRegistry;
+use Laradium\Laradium\Content\Models\Page;
+use Laradium\Laradium\Content\Registries\WidgetRegistry;
 
 class PageController
 {
@@ -56,6 +56,6 @@ class PageController
             abort(404);
         }
 
-        return view('aven-content::page', compact('page', 'layout'));
+        return view('laradium-content::page', compact('page', 'layout'));
     }
 }

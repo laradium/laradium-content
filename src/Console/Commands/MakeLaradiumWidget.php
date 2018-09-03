@@ -1,26 +1,26 @@
 <?php
 
-namespace Netcore\Aven\Content\Console\Commands;
+namespace Laradium\Laradium\Content\Console\Commands;
 
 use Artisan;
 use Illuminate\Console\Command;
 use File;
 
-class MakeAvenWidget extends Command
+class MakeLaradiumWidget extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'aven:widget {name} {--t}';
+    protected $signature = 'laradium:widget {name} {--t}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates Aven widget';
+    protected $description = 'Creates Laradium widget';
 
     /**
      * Create a new command instance.
@@ -44,18 +44,18 @@ class MakeAvenWidget extends Command
         $translations = $this->option('t');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
-        $widgetDirectory = app_path('Aven/Widgets');
+        $widgetDirectory = app_path('Laradium/Widgets');
         if (!file_exists($widgetDirectory)) {
             File::makeDirectory($widgetDirectory, 0755, true);
             $this->info('Creating widgets directory');
         }
 
-        $dummyWidget = File::get(__DIR__ . '/../../../stubs/aven-widget.stub');
+        $dummyWidget = File::get(__DIR__ . '/../../../stubs/laradium-widget.stub');
         $widget = str_replace('{{namespace}}', $namespace, $dummyWidget);
         $widget = str_replace('{{widget}}', $name, $widget);
-        $widget = str_replace('{{widgetNamespace}}', config('aven-content.default_widget_models_directory', 'App'), $widget);
+        $widget = str_replace('{{widgetNamespace}}', config('laradium-content.default_widget_models_directory', 'App'), $widget);
 
-        $widgetFilePath = app_path('Aven/Widgets/' . $name . 'Widget.php');
+        $widgetFilePath = app_path('Laradium/Widgets/' . $name . 'Widget.php');
 
         if (!file_exists($widgetFilePath)) {
             File::put($widgetFilePath, $widget);

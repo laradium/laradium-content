@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Content\Aven\Channels;
+namespace Laradium\Laradium\Content\Laradium\Channels;
 
-use Netcore\Aven\Aven\FieldSet;
+use Laradium\Laradium\Base\FieldSet;
 
 Class MainChannel
 {

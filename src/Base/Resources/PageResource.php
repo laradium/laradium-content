@@ -1,17 +1,17 @@
 <?php
 
-namespace Netcore\Aven\Content\Aven\Resources;
+namespace Laradium\Laradium\Content\Laradium\Resources;
 
-use Netcore\Aven\Content\Models\Page;
+use Laradium\Laradium\Content\Models\Page;
 use Illuminate\Http\Request;
-use Netcore\Aven\Aven\AbstractAvenResource;
-use Netcore\Aven\Aven\FieldSet;
-use Netcore\Aven\Aven\Form;
-use Netcore\Aven\Aven\Resource;
-use Netcore\Aven\Aven\ColumnSet;
-use Netcore\Aven\Aven\Table;
+use Laradium\Laradium\Base\AbstractResource;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Form;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\Table;
 
-Class PageResource extends AbstractAvenResource
+Class PageResource extends AbstractResource
 {
 
     /**
@@ -20,14 +20,14 @@ Class PageResource extends AbstractAvenResource
     protected $resource = Page::class;
 
     /**
-     * @return \Netcore\Aven\Aven\Resource
+     * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
         return (new Resource)->make(function (FieldSet $set) {
 
             $channelName = session()->get('channel');
-            $channelRegistry = app(\Netcore\Aven\Content\Registries\ChannelRegistry::class);
+            $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
             $channel = $channelRegistry->getChannelByName($channelName);
             $channelInstance = new $channel;
 
@@ -41,7 +41,7 @@ Class PageResource extends AbstractAvenResource
                 $set->text('meta_keywords')->translatable();
                 $set->text('meta_title')->translatable();
                 $set->text('meta_description')->translatable();
-                $set->file('meta_image')->rules('max:' . config('aven.file_size', 2024));
+                $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
             });
 
             $channelInstance->fields($set);
@@ -81,7 +81,7 @@ Class PageResource extends AbstractAvenResource
      */
     public function table()
     {
-        $channelRegistry = app(\Netcore\Aven\Content\Registries\ChannelRegistry::class);
+        $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
         $channels = $channelRegistry->all()->mapWithKeys(function ($item) {
             return [str_singular(key($item)) => ucfirst(str_replace('-', ' ', str_singular(key($item))))];
         });
@@ -102,6 +102,6 @@ Class PageResource extends AbstractAvenResource
         })
             ->actions(['edit', 'delete'])
             ->relations(['translations'])
-            ->additionalView('aven-content::admin.pages.index-top', compact('channels'));
+            ->additionalView('laradium-content::admin.pages.index-top', compact('channels'));
     }
 }
