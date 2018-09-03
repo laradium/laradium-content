@@ -39,8 +39,13 @@ class PageController
      */
     public function resolve($slug = null)
     {
+        $page = null;
         if (!$slug) {
             $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
+        }
+
+        if(!$page) {
+            abort(404);
         }
 
         $channel = $page->content_type ?: MainChannel::class;

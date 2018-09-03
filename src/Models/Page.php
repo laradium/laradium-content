@@ -53,9 +53,15 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         'page'
     ];
 
-    public function __construct()
+    /**
+     * Page constructor.
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
     {
         $this->hasAttachedFile('meta_image', []);
+
+        parent::__construct($attributes);
     }
 
     /**
