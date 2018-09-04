@@ -10,7 +10,7 @@
 "repositories": [
     {
       "type": "path",
-      "url": "../packages/laradium-package"
+      "url": "../packages/laradium"
     },
     {
       "type": "path",
@@ -24,7 +24,7 @@ Directory structure should look like this
 ```
 -Project
 -packages
---laradium-package
+--laradium
 --laradium-content
 ```
 
