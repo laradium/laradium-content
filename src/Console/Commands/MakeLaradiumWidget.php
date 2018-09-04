@@ -68,7 +68,7 @@ class MakeLaradiumWidget extends Command
 
         $this->info('Widget successfully created!');
 
-        cache()->forget('widget-list');
+        cache()->forget('laradium::widget-list');
 
         return;
     }
