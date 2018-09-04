@@ -1,6 +1,6 @@
 <?php
 
-namespace Laradium\Laradium\Content\Laradium\Channels;
+namespace Laradium\Laradium\Content\Base\Channels;
 
 use Laradium\Laradium\Base\FieldSet;
 

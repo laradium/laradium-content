@@ -2,11 +2,10 @@
 
 namespace Laradium\Laradium\Content\Http\Controllers\Admin;
 
-use Laradium\Laradium\Content\Laradium\Channels\MainChannel;
+use Laradium\Laradium\Content\Base\Channels\MainChannel;
 use Laradium\Laradium\Content\Models\ContentBlock;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Models\Page;
-use Laradium\Laradium\Content\Registries\WidgetRegistry;
 
 class PageController
 {

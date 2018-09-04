@@ -11,11 +11,11 @@ Route::group([
     ]);
 
     Route::get('pages/create/{channel}', [
-        'uses' => '\Laradium\Laradium\Content\Laradium\Resources\PageResource@create'
+        'uses' => '\Laradium\Laradium\Content\Base\Resources\PageResource@create'
     ]);
 
     Route::get('pages/{page}/edit', [
-        'uses' => '\Laradium\Laradium\Content\Laradium\Resources\PageResource@edit'
+        'uses' => '\Laradium\Laradium\Content\Base\Resources\PageResource@edit'
     ]);
 });
 

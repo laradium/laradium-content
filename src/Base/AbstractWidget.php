@@ -1,6 +1,6 @@
 <?php
 
-namespace Laradium\Laradium\Content\Laradium;
+namespace Laradium\Laradium\Content\Base;
 
 use Laradium\Laradium\Base\FieldSet;
 

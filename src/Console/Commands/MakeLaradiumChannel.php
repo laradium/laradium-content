@@ -67,6 +67,8 @@ class MakeLaradiumChannel extends Command
 
         $this->info('Channel successfully created!');
 
+        cache()->forget('laradium::channel-list');
+
         return;
     }
 }

@@ -3,7 +3,7 @@
 namespace {{namespace}}\Laradium\Widgets;
 
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Content\Laradium\AbstractWidget;
+use Laradium\Laradium\Content\Base\AbstractWidget;
 use {{widgetNamespace}}\{{widget}};
 
 class {{widget}}Widget extends AbstractWidget

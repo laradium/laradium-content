@@ -48,7 +48,7 @@ Directory structure should look like this
 4. Configure `config/laradium.php` file with your preferences
 5. Add widgetConstructor field to you `laradium.php` field list
 ```
-'widgetConstructor' => \Laradium\Laradium\Content\Laradium\Fields\WidgetConstructor::class,
+'widgetConstructor' => \Laradium\Laradium\Content\Base\Fields\WidgetConstructor::class,
 ```
 
 # Usage
@@ -110,7 +110,7 @@ namespace App\Laradium\Widgets;
 
 use App\Models\Widgets\Hiw;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Content\Laradium\AbstractWidget;
+use Laradium\Laradium\Content\Base\AbstractWidget;
 
 class HiwWidget extends AbstractWidget
 {

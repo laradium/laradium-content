@@ -1,6 +1,6 @@
 <?php
 
-namespace Laradium\Laradium\Content\Laradium\Resources;
+namespace Laradium\Laradium\Content\Base\Resources;
 
 use Laradium\Laradium\Content\Models\Page;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ Class PageResource extends AbstractResource
      */
     public function resource()
     {
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
 
             $channelName = session()->get('channel');
             $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
@@ -77,7 +77,7 @@ Class PageResource extends AbstractResource
     }
 
     /**
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
@@ -86,7 +86,7 @@ Class PageResource extends AbstractResource
             return [str_singular(key($item)) => ucfirst(str_replace('-', ' ', str_singular(key($item))))];
         });
 
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('id', '#ID');
             $column->add('is_active', 'Is Visible?')->modify(function ($item) {
                 return $item->is_active ? 'Yes' : 'No';
