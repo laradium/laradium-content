@@ -56,12 +56,16 @@ class ContentRepository
     {
         foreach (translate()->languages() as $lang) {
             $translations['locale'] = $lang['iso_code'];
-            $model->translations()->firstOrCreate(
+            $tran = $model->translations()->firstOrCreate(
                 [
                     'locale' => $lang['iso_code']
                 ],
-                $translations
+                array_except($translations, 'file')
             );
+
+            if (isset($translations['file'])) {
+                $this->putFiles($tran, $translations['file']);
+            }
         }
     }
 
@@ -73,7 +77,8 @@ class ContentRepository
     {
         foreach ($relations as $relation => $items) {
             foreach ($items as $item) {
-                $relationModel = $model->{$relation}()->create(array_except($item, ['translations', 'file', 'relations']));
+                $relationModel = $model->{$relation}()->create(array_except($item,
+                    ['translations', 'file', 'relations']));
 
                 if (isset($item['file'])) {
                     $this->putFiles($relationModel, $item['file']);
