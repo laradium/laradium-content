@@ -34,11 +34,11 @@ Directory structure should look like this
 "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/laradium/laradium"
+            "url": "https://github.com/laradium/laradium.git"
         },
         {
             "type": "git",
-            "url": "https://github.com/laradium/laradium-content"
+            "url": "https://github.com/laradium/laradium-content.git"
         }
     ]
 ```
@@ -95,8 +95,6 @@ Class BlogChannel
 
 You need to create model for Blog channel where you can specify all your needed columns and using `morphsTo` field type you can add them to you channel
 
-2. You need to add created channels to `ocnfig/laradium-content.php` file in order to be able actually see them.
-
 # Creating widgets
 
 1. Run this command `php artisan laradium:widget` (_It automatically creates model for you You can pass `--t` argument to also create translations model_)
@@ -142,4 +140,3 @@ class HiwWidget extends AbstractWidget
 ```
 
 You can specify your fields under `fields` method.
-Do not forget to add created widget in `config/laradium-content.php` file under widget list
