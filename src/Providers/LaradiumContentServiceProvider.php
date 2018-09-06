@@ -69,7 +69,7 @@ class LaradiumContentServiceProvider extends ServiceProvider
      */
     private function getWidgetList()
     {
-        return cache()->rememberForever('laradium::widget-list', function () {
+//        return cache()->rememberForever('laradium::widget-list', function () {
 
             $widgetList = [];
             $widgets = config('laradium-content.widget_path', []);
@@ -88,7 +88,7 @@ class LaradiumContentServiceProvider extends ServiceProvider
 
 
             return $widgetList;
-        });
+//        });
     }
 
     /**
@@ -96,7 +96,7 @@ class LaradiumContentServiceProvider extends ServiceProvider
      */
     private function getChannelList()
     {
-        return cache()->rememberForever('laradium::channel-list', function () {
+//        return cache()->rememberForever('laradium::channel-list', function () {
             $channelPath = base_path('vendor/laradium/laradium-content/src/Base/Channels');
 
             $channelList = [];
@@ -124,6 +124,6 @@ class LaradiumContentServiceProvider extends ServiceProvider
             }
 
             return $channelList;
-        });
+//        });
     }
 }

@@ -9,4 +9,9 @@ return [
     'default_widget_models_directory'   => 'App\\Models\\Widgets',
 
     'default_channels_models_directory' => 'App\\Models\\Channels',
+
+    'layouts' => [
+        'layouts.main' => 'Main',
+        'layouts.hiw'  => 'How It Works',
+    ]
 ];

@@ -33,6 +33,7 @@ Class PageResource extends AbstractResource
 
             $set->text('title')->translatable();
             $set->text('slug')->translatable();
+            $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
 
             $set->boolean('is_active');
             $set->boolean('is_homepage');
