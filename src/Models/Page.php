@@ -7,7 +7,7 @@ use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Czim\Paperclip\Model\PaperclipTrait;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
-use Laradium\Laradium\Content\Traits\PaperclipAndTranslatable;
+use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
@@ -100,5 +100,13 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         }
 
         return $widgetList;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAttributes()
+    {
+        return parent::getAttributes();
     }
 }
