@@ -13,36 +13,68 @@ class ContentRepository
     public function put($pages)
     {
         foreach ($pages as $page) {
-            $p = \Laradium\Laradium\Content\Models\Page::create(array_except($page, ['translations', 'data']));
+
+            $p = \Laradium\Laradium\Content\Models\Page::create(array_except($page,
+                ['translations', 'data', 'channel', 'content']));
             foreach (translate()->languages() as $lang) {
                 $page['translations']['locale'] = $lang['iso_code'];
                 $p->translations()->firstOrCreate($page['translations']);
             }
-            $data = $page['data'];
-            $i = 1;
-            foreach ($data as $item) {
-                $model = new $item['widget'];
-                $model->fill(array_except($item['data'], ['relations', 'translations', 'file']));
+            if (isset($page['channel'])) {
+                $channel = new $page['channel'];
+                $model = $channel->model;
+                $data = $page['content'];
+
+                $model = new $model;
+                $model->fill(array_except($data, ['relations', 'translations', 'file']));
                 $model->save();
-                $p->blocks()->create([
-                    'sequence_no' => $i,
-                    'block_type'  => $item['widget'],
-                    'block_id'    => $model->id
+
+                $p->update([
+                    'content_type' => $channel->model,
+                    'content_id'   => $model->id,
                 ]);
-                $i++;
 
-                if (isset($item['data']['translations'])) {
-                    $this->putTranslations($item['data']['translations'], $model);
+                if (isset($data['translations'])) {
+                    $this->putTranslations($data['translations'], $model);
                 }
 
-                if (isset($item['data']['file'])) {
-                    $this->putFiles($model, $item['data']['file']);
+                if (isset($data['file'])) {
+                    $this->putFiles($model, $data['file']);
                 }
 
-                if (isset($item['data']['relations'])) {
-                    $this->putRelations($item['data']['relations'], $model);
+                if (isset($data['relations'])) {
+                    $this->putRelations($data['relations'], $model);
                 }
+            }
 
+            if (isset($page['data'])) {
+                $data = $page['data'];
+                $i = 1;
+
+                foreach ($data as $item) {
+                    $model = new $item['widget'];
+                    $model->fill(array_except($item['data'], ['relations', 'translations', 'file']));
+                    $model->save();
+                    $p->blocks()->create([
+                        'sequence_no' => $i,
+                        'block_type'  => $item['widget'],
+                        'block_id'    => $model->id
+                    ]);
+                    $i++;
+
+                    if (isset($item['data']['translations'])) {
+                        $this->putTranslations($item['data']['translations'], $model);
+                    }
+
+                    if (isset($item['data']['file'])) {
+                        $this->putFiles($model, $item['data']['file']);
+                    }
+
+                    if (isset($item['data']['relations'])) {
+                        $this->putRelations($item['data']['relations'], $model);
+                    }
+
+                }
             }
         }
     }
