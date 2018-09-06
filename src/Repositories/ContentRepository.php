@@ -20,28 +20,27 @@ class ContentRepository
             }
             $data = $page['data'];
             $i = 1;
-            foreach ($data as $className => $items) {
-                $model = new $className;
-                $model->where('id', '>=', 1)->delete();
-                $model->fill(array_except($items, ['relations', 'translations', 'file']));
+            foreach ($data as $item) {
+                $model = new $item['widget'];
+                $model->fill(array_except($item['data'], ['relations', 'translations', 'file']));
                 $model->save();
                 $p->blocks()->create([
                     'sequence_no' => $i,
-                    'block_type'  => $className,
+                    'block_type'  => $item['widget'],
                     'block_id'    => $model->id
                 ]);
                 $i++;
 
-                if (isset($items['translations'])) {
-                    $this->putTranslations($items['translations'], $model);
+                if (isset($item['data']['translations'])) {
+                    $this->putTranslations($item['data']['translations'], $model);
                 }
 
-                if (isset($items['file'])) {
-                    $this->putFiles($model, $items['file']);
+                if (isset($item['data']['file'])) {
+                    $this->putFiles($model, $item['data']['file']);
                 }
 
-                if (isset($items['relations'])) {
-                    $this->putRelations($items['relations'], $model);
+                if (isset($item['data']['relations'])) {
+                    $this->putRelations($item['data']['relations'], $model);
                 }
 
             }
