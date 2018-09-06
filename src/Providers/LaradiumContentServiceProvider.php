@@ -69,26 +69,24 @@ class LaradiumContentServiceProvider extends ServiceProvider
      */
     private function getWidgetList()
     {
-//        return cache()->rememberForever('laradium::widget-list', function () {
 
-            $widgetList = [];
-            $widgets = config('laradium-content.widget_path', []);
-            $namespace = app()->getNamespace();
-            $widgetPath = str_replace($namespace, '', $widgets);
-            $widgetPath = str_replace('\\', '/', $widgetPath);
-            $widgetPath = app_path($widgetPath);
-            if (file_exists($widgetPath)) {
-                foreach (\File::allFiles($widgetPath) as $path) {
-                    $widget = $path->getPathname();
-                    $baseName = basename($widget, '.php');
-                    $widget = $widgets . '\\' . $baseName;
-                    $widgetList[] = $widget;
-                }
+        $widgetList = [];
+        $widgets = config('laradium-content.widget_path', []);
+        $namespace = app()->getNamespace();
+        $widgetPath = str_replace($namespace, '', $widgets);
+        $widgetPath = str_replace('\\', '/', $widgetPath);
+        $widgetPath = app_path($widgetPath);
+        if (file_exists($widgetPath)) {
+            foreach (\File::allFiles($widgetPath) as $path) {
+                $widget = $path->getPathname();
+                $baseName = basename($widget, '.php');
+                $widget = $widgets . '\\' . $baseName;
+                $widgetList[] = $widget;
             }
+        }
 
 
-            return $widgetList;
-//        });
+        return $widgetList;
     }
 
     /**
@@ -96,34 +94,32 @@ class LaradiumContentServiceProvider extends ServiceProvider
      */
     private function getChannelList()
     {
-//        return cache()->rememberForever('laradium::channel-list', function () {
-            $channelPath = base_path('vendor/laradium/laradium-content/src/Base/Channels');
+        $channelPath = base_path('vendor/laradium/laradium-content/src/Base/Channels');
 
-            $channelList = [];
-            if (file_exists($channelPath)) {
-                foreach (\File::allFiles($channelPath) as $path) {
-                    $channel = $path->getPathname();
-                    $baseName = basename($channel, '.php');
-                    $channel = 'Laradium\\Laradium\\Content\\Base\\Channels\\' . $baseName;
-                    $channelList[] = $channel;
-                }
+        $channelList = [];
+        if (file_exists($channelPath)) {
+            foreach (\File::allFiles($channelPath) as $path) {
+                $channel = $path->getPathname();
+                $baseName = basename($channel, '.php');
+                $channel = 'Laradium\\Laradium\\Content\\Base\\Channels\\' . $baseName;
+                $channelList[] = $channel;
             }
+        }
 
-            $channels = config('laradium-content.channel_path', []);
-            $namespace = app()->getNamespace();
-            $channelPath = str_replace($namespace, '', $channels);
-            $channelPath = str_replace('\\', '/', $channelPath);
-            $channelPath = app_path($channelPath);
-            if (file_exists($channelPath)) {
-                foreach (\File::allFiles($channelPath) as $path) {
-                    $channel = $path->getPathname();
-                    $baseName = basename($channel, '.php');
-                    $channel = $channels . '\\' . $baseName;
-                    $channelList[] = $channel;
-                }
+        $channels = config('laradium-content.channel_path', []);
+        $namespace = app()->getNamespace();
+        $channelPath = str_replace($namespace, '', $channels);
+        $channelPath = str_replace('\\', '/', $channelPath);
+        $channelPath = app_path($channelPath);
+        if (file_exists($channelPath)) {
+            foreach (\File::allFiles($channelPath) as $path) {
+                $channel = $path->getPathname();
+                $baseName = basename($channel, '.php');
+                $channel = $channels . '\\' . $baseName;
+                $channelList[] = $channel;
             }
+        }
 
-            return $channelList;
-//        });
+        return $channelList;
     }
 }
