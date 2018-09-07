@@ -43,7 +43,7 @@ class PageController
             $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
         } else {
             $page = Page::with(['blocks.widget', 'content'])->whereHas('translations', function($q) use($slug) {
-                $q->whereSlug('/' . $slug);
+                $q->whereSlug($slug);
             })->first();
         }
 
