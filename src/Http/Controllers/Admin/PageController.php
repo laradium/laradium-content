@@ -41,18 +41,16 @@ class PageController
         $page = null;
         if (!$slug) {
             $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
+        } else {
+            $page = Page::with(['blocks.widget', 'content'])->whereHas('translations', function($q) use($slug) {
+                $q->whereSlug('/' . $slug);
+            })->first();
         }
-
-        $page = Page::with(['blocks.widget', 'content'])->whereHas('translations', function($q) use($slug) {
-            $q->whereSlug('/' . $slug);
-        })->first();
 
         if(!$page) {
             abort(404);
         }
 
-        $channel = $page->content_type ?: MainChannel::class;
-        $channel = new $channel;
         $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts', ['layouts.main' => 'Main'])));
 
         if (!$page) {
