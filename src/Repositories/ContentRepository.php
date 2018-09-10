@@ -17,7 +17,7 @@ class ContentRepository
             $p = \Laradium\Laradium\Content\Models\Page::create(array_except($page,
                 ['translations', 'data', 'channel', 'content']));
             foreach (translate()->languages() as $lang) {
-                $page['translations']['locale'] = $lang['iso_code'];
+                $page['translations']['locale'] = $lang->iso_code;
                 $p->translations()->firstOrCreate($page['translations']);
             }
             if (isset($page['channel'])) {
@@ -86,10 +86,10 @@ class ContentRepository
     protected function putTranslations($translations, $model)
     {
         foreach (translate()->languages() as $lang) {
-            $translations['locale'] = $lang['iso_code'];
+            $translations['locale'] = $lang->iso_code;
             $tran = $model->translations()->firstOrCreate(
                 [
-                    'locale' => $lang['iso_code']
+                    'locale' => $lang->iso_code
                 ],
                 array_except($translations, 'file')
             );
