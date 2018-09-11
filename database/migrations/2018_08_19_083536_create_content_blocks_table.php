@@ -25,20 +25,6 @@ class CreateContentBlocksTable extends Migration
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
             $table->timestamps();
         });
-
-        $menus = [
-            'Admin menu' => [
-                [
-                    'is_active'    => 1,
-                    'translations' => [
-                        'name' => 'Pages',
-                        'url'  => '/admin/pages',
-                    ]
-                ],
-            ]
-        ];
-
-        menu()->seed($menus);
     }
 
     /**
