@@ -286,6 +286,7 @@ class WidgetConstructor extends Field
             'name'        => $this->relationName,
             'template'    => $this->template(),
             'tab'         => $this->tab(),
+            'col'         => $this->col,
             'items'       => $items
         ];
 
