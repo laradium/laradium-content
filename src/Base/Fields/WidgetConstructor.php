@@ -227,18 +227,18 @@ class WidgetConstructor extends Field
                 $field->isTemplate(true);
                 $field->setValue(null);
 
-                $templates[$widgetName]['fields'][] = $field->formatedResponse($field);
+                $templates[$widgetName]['fields'][] = $field->formattedResponse($field);
             }
 
             $contentTypeField = $this->createContentTypeField($widgetModelClass, $attributeList);
             $morphNameField = $this->createMorphNameField($widgetModel, $attributeList);
-            $templates[$widgetName]['fields'][] = $contentTypeField->formatedResponse($contentTypeField);
-            $templates[$widgetName]['fields'][] = $morphNameField->formatedResponse($morphNameField);
+            $templates[$widgetName]['fields'][] = $contentTypeField->formattedResponse($contentTypeField);
+            $templates[$widgetName]['fields'][] = $morphNameField->formattedResponse($morphNameField);
             $templates[$widgetName]['name'] = 'Widget - ' . ucfirst($morphAttributeName);
             $templates[$widgetName]['isSortable'] = true;
             if ($this->isSortable()) {
                 $sortableField = $this->createSortableField($this->model, $baseAttributeList);
-                $templates[$widgetName]['fields'][] = $sortableField->formatedResponse($sortableField);
+                $templates[$widgetName]['fields'][] = $sortableField->formattedResponse($sortableField);
                 $templates[$widgetName][$this->sortableColumn] = 0;
             }
 
@@ -258,7 +258,7 @@ class WidgetConstructor extends Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $items = [];
         foreach ($this->fieldGroups as $id => $group) {
@@ -275,7 +275,7 @@ class WidgetConstructor extends Field
             }
 
             foreach ($group['fields'] as $field) {
-                $item['fields'][] = $field->formatedResponse();
+                $item['fields'][] = $field->formattedResponse();
             }
             $items[] = $item;
         }
