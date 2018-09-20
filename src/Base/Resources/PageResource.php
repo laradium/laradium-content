@@ -66,7 +66,8 @@ Class PageResource extends AbstractResource
      */
     public function edit($id)
     {
-        $page = Page::find($id);
+        $page = Page::findOrFail($id);
+
         if ($page->content_type) {
             $channelName = str_plural(array_last(explode('\\', $page->content_type)));
             session()->put('channel', strtolower($channelName));
