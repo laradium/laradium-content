@@ -41,6 +41,7 @@ class WidgetConstructor extends Field
      * @var string
      */
     protected $morphAttributeName;
+
     /**
      * @var string
      */
@@ -65,7 +66,6 @@ class WidgetConstructor extends Field
         $this->morphName = 'block';
         $this->sortableColumn = 'sequence_no';
         $this->isSortable = true;
-
     }
 
     /**
@@ -79,6 +79,7 @@ class WidgetConstructor extends Field
         $fieldList = [];
         $rules = [];
         $items = $this->relation()->orderBy('sequence_no')->get();
+
         foreach ($items as $item) {
             $widgetClass = $this->widgetRegistry->getByModel($item->block_type);
             $widget = new $widgetClass;
@@ -102,13 +103,13 @@ class WidgetConstructor extends Field
                     $item->id,
                     $this->morphAttributeName
                 ]);
+
                 $clonedField = clone $field;
                 $clonedField->setModel($model);
                 $clonedField->build($morphAttributeList, $model);
 
                 $fieldList[$item->id]['fields'][] = $clonedField;
-                $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
-
+                $rules += $clonedField->getRules();
             }
 
             $fieldList[$item->id]['fields'][] = $this->createContentTypeField($this->morphClass, $morphAttributeList);
@@ -119,12 +120,15 @@ class WidgetConstructor extends Field
                 $fieldList[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
                 $fieldList[$item->id][$this->sortableColumn] = $item->{$this->sortableColumn};
             }
+
             $fieldList[$item->id]['name'] = 'Widget - ' . str_singular(ucfirst(str_replace('_', ' ',
                     $model->getTable())));
         }
+
         if ($rules) {
             $this->validationRules = $rules;
         }
+
         $this->fieldGroups = $fieldList;
 
         return $this;
@@ -202,6 +206,7 @@ class WidgetConstructor extends Field
             $this->relationName,
             '__ID__',
         ]);
+
         foreach ($this->widgetRegistry->all() as $widget) {
             $widgetClass = key($widget);
             $widgetName = array_last(explode('\\', $widgetClass));
@@ -270,6 +275,7 @@ class WidgetConstructor extends Field
                 'isSortable'     => $this->isSortable(),
                 'url'            => '/admin/content-block/' . $id
             ];
+
             if ($this->isSortable()) {
                 $item['order'] = $group[$this->sortableColumn];
             }
@@ -277,6 +283,7 @@ class WidgetConstructor extends Field
             foreach ($group['fields'] as $field) {
                 $item['fields'][] = $field->formattedResponse();
             }
+
             $items[] = $item;
         }
 
@@ -289,7 +296,6 @@ class WidgetConstructor extends Field
             'col'         => $this->col,
             'items'       => $items
         ];
-
     }
 
     /**
