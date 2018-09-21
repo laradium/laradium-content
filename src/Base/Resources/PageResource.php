@@ -20,6 +20,14 @@ Class PageResource extends AbstractResource
     protected $resource = Page::class;
 
     /**
+     * @var array
+     */
+    protected $actions = [
+        'edit',
+        'delete'
+    ];
+
+    /**
      * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
@@ -102,7 +110,6 @@ Class PageResource extends AbstractResource
                 }
             });
         })
-            ->actions(['edit', 'delete'])
             ->relations(['translations'])
             ->additionalView('laradium-content::admin.pages.index-top', compact('channels'));
     }
