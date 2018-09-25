@@ -82,6 +82,10 @@ class WidgetConstructor extends Field
 
         foreach ($items as $item) {
             $widgetClass = $this->widgetRegistry->getByModel($item->block_type);
+            if (!$widgetClass) {
+                continue;
+            }
+            
             $widget = new $widgetClass;
             $fieldSet = new FieldSet;
             $fieldSet->setModel($item);
