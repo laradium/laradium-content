@@ -42,19 +42,34 @@ class PageController
         if (!$slug) {
             $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
         } else {
-            $page = Page::with(['blocks.widget', 'content'])->whereHas('translations', function($q) use($slug) {
-                $q->whereSlug($slug);
-            })->first();
-        }
+            $locale = app()->getLocale();
+            $page = Page::with(['blocks.widget', 'content'])->whereHas('translations',
+                function ($q) use ($slug, $locale) {
+                    $q->whereSlug('/' . trim($slug, '/'))->whereLocale($locale);
+                })->first();
 
-        if(!$page) {
-            abort(404);
+            if (!$page) {
+                $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
+                if ($page) {
+                    return redirect()->to($page->slug);
+                }
+            }
         }
-
-        $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts', ['layouts.main' => 'Main'])));
 
         if (!$page) {
             abort(404);
+        }
+
+        $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts',
+            ['layouts.main' => 'Main'])));
+
+        if (!$page) {
+            abort(404);
+        }
+
+        if ($page->is_homepage && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
+                '/') != $slug) {
+            return redirect()->to($page->slug);
         }
 
         return view('laradium-content::page', compact('page', 'layout'));

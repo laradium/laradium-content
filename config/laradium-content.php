@@ -13,5 +13,7 @@ return [
     'layouts' => [
         'layouts.main' => 'Main',
         'layouts.hiw'  => 'How It Works',
-    ]
+    ],
+
+    'use_homepage_slug' => false,
 ];
