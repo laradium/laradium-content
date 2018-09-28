@@ -2,15 +2,11 @@
 
 namespace Laradium\Laradium\Content\Http\Controllers\Admin;
 
-use Laradium\Laradium\Content\Base\Channels\MainChannel;
 use Laradium\Laradium\Content\Models\ContentBlock;
-use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Models\Page;
 
 class PageController
 {
-
-
     /**
      * @param $id
      * @return array
@@ -31,7 +27,6 @@ class PageController
         ];
     }
 
-
     /**
      * @param null $slug
      * @return mixed
@@ -41,19 +36,17 @@ class PageController
         $page = null;
         if (!$slug) {
             $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
+
+            if ($page && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
+                    '/') !== $slug) {
+                return redirect()->to($page->slug);
+            }
         } else {
             $locale = app()->getLocale();
             $page = Page::with(['blocks.widget', 'content'])->whereHas('translations',
                 function ($q) use ($slug, $locale) {
-                    $q->whereSlug('/' . trim($slug, '/'))->whereLocale($locale);
+                    $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
-
-            if (!$page) {
-                $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
-                if ($page) {
-                    return redirect()->to($page->slug);
-                }
-            }
         }
 
         if (!$page) {
@@ -62,15 +55,6 @@ class PageController
 
         $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts',
             ['layouts.main' => 'Main'])));
-
-        if (!$page) {
-            abort(404);
-        }
-
-        if ($page->is_homepage && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
-                '/') != $slug) {
-            return redirect()->to($page->slug);
-        }
 
         return view('laradium-content::page', compact('page', 'layout'));
     }
