@@ -2,10 +2,35 @@
 
 namespace Laradium\Laradium\Content\Repositories;
 
+use Laradium\Laradium\Content\Models\Page;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ContentRepository
 {
+    /**
+     * @param $key
+     * @return object
+     * @throws \Exception
+     */
+    public function getPage($key)
+    {
+        $pages = cache()->rememberForever('laradium::content-pages', function () {
+            return Page::get();
+        });
+
+        $page = $pages->where('key', $key)->first();
+        if (!$page) {
+            return (object)[
+                'title' => '',
+                'url'   => url('/')
+            ];
+        }
+
+        return (object)[
+            'title' => $page->title,
+            'url'   => url($page->slug)
+        ];
+    }
 
     /**
      * @param $pages
@@ -13,13 +38,14 @@ class ContentRepository
     public function put($pages)
     {
         foreach ($pages as $page) {
-
             $p = \Laradium\Laradium\Content\Models\Page::create(array_except($page,
                 ['translations', 'data', 'channel', 'content']));
+
             foreach (translate()->languages() as $lang) {
                 $page['translations']['locale'] = $lang->iso_code;
                 $p->translations()->firstOrCreate($page['translations']);
             }
+
             if (isset($page['channel'])) {
                 $channel = new $page['channel'];
                 $model = $channel->model;

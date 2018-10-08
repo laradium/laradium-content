@@ -2,10 +2,10 @@
 
 namespace Laradium\Laradium\Content\Models;
 
-use Laradium\Laradium\Content\Models\Translations\PageTranslation;
+use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
-use Czim\Paperclip\Model\PaperclipTrait;
+use Laradium\Laradium\Content\Models\Translations\PageTranslation;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
 use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
@@ -31,6 +31,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         'is_homepage',
         'meta_image',
         'layout',
+        'key'
     ];
 
     /**
