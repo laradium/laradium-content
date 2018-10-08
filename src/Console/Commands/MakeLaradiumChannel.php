@@ -3,8 +3,8 @@
 namespace Laradium\Laradium\Content\Console\Commands;
 
 use Artisan;
-use Illuminate\Console\Command;
 use File;
+use Illuminate\Console\Command;
 
 class MakeLaradiumChannel extends Command
 {
@@ -60,14 +60,19 @@ class MakeLaradiumChannel extends Command
             File::put($channelFilePath, $channel);
         }
 
-        Artisan::call('make:model', ['name' => 'Models/Channels/' . $name]);
+        Artisan::call('make:model', [
+            'name'        => 'Models/Channels/' . $name,
+            '--migration' => true
+        ]);
+
         if ($translations) {
-            Artisan::call('make:model', ['name' => 'Models/Channels/Translations/' . $name . 'Translation']);
+            Artisan::call('make:model', [
+                'name'        => 'Models/Channels/Translations/' . $name . 'Translation',
+                '--migration' => true
+            ]);
         }
 
         $this->info('Channel successfully created!');
-
-        cache()->forget('laradium::channel-list');
 
         return;
     }

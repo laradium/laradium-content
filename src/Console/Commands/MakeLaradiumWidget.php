@@ -3,8 +3,8 @@
 namespace Laradium\Laradium\Content\Console\Commands;
 
 use Artisan;
-use Illuminate\Console\Command;
 use File;
+use Illuminate\Console\Command;
 
 class MakeLaradiumWidget extends Command
 {
@@ -39,7 +39,6 @@ class MakeLaradiumWidget extends Command
      */
     public function handle()
     {
-
         $name = $this->argument('name');
         $translations = $this->option('t');
         $namespace = str_replace('\\', '', app()->getNamespace());
@@ -61,14 +60,19 @@ class MakeLaradiumWidget extends Command
             File::put($widgetFilePath, $widget);
         }
 
-        Artisan::call('make:model', ['name' => 'Models/Widgets/' . $name]);
+        Artisan::call('make:model', [
+            'name'        => 'Models/Widgets/' . $name,
+            '--migration' => true
+        ]);
+
         if ($translations) {
-            Artisan::call('make:model', ['name' => 'Models/Widgets/Translations/' . $name . 'Translation']);
+            Artisan::call('make:model', [
+                'name'        => 'Models/Widgets/Translations/' . $name . 'Translation',
+                '--migration' => true
+            ]);
         }
 
         $this->info('Widget successfully created!');
-
-        cache()->forget('laradium::widget-list');
 
         return;
     }
