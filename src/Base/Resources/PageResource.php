@@ -2,14 +2,10 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
-use Laradium\Laradium\Content\Models\Page;
-use Illuminate\Http\Request;
 use Laradium\Laradium\Base\AbstractResource;
-use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Form;
-use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\ColumnSet;
-use Laradium\Laradium\Base\Table;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Content\Models\Page;
 
 Class PageResource extends AbstractResource
 {
@@ -33,14 +29,13 @@ Class PageResource extends AbstractResource
     public function resource()
     {
         return laradium()->resource(function (FieldSet $set) {
-
             $channelName = session()->get('channel');
             $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
             $channel = $channelRegistry->getChannelByName($channelName);
             $channelInstance = new $channel;
 
-            $set->text('title')->translatable();
-            $set->text('slug')->translatable();
+            $set->text('title')->rules('required|max:255')->translatable();
+            $set->text('slug')->rules('max:255')->translatable();
             $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
 
             $set->boolean('is_active');
@@ -96,7 +91,7 @@ Class PageResource extends AbstractResource
             return [str_singular(key($item)) => ucfirst(str_replace('-', ' ', str_singular(key($item))))];
         });
 
-        return laradium()->table(function (ColumnSet $column) {
+        $table = laradium()->table(function (ColumnSet $column) {
             $column->add('id', '#ID');
             $column->add('is_active', 'Is Visible?')->modify(function ($item) {
                 return $item->is_active ? 'Yes' : 'No';
@@ -105,12 +100,14 @@ Class PageResource extends AbstractResource
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
-                } else {
-                    return 'Main';
                 }
+
+                return 'Main';
             });
         })
             ->relations(['translations'])
             ->additionalView('laradium-content::admin.pages.index-top', compact('channels'));
+
+        return $table;
     }
 }
