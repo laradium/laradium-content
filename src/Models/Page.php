@@ -93,7 +93,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         })->toArray();
 
         $widgetList = [];
-        foreach ($this->blocks as $block) {
+        foreach ($this->blocks->sortBy('sequence_no') as $block) {
             $widget = $widgets[$block->block_type];
             $widget = new $widget;
             $widgetList[] = view($widget->view(), [
