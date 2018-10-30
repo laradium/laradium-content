@@ -2,12 +2,16 @@
 
 namespace {{namespace}}\Laradium\Channels;
 
-use Laradium\Laradium\Base\FieldSet;
-use App\Laradium\Page;
 use {{channelNamespace}}\{{page}};
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Content\Models\Page;
 
 class {{page}}Channel
 {
+    /**
+     * @var string
+     */
+    public $model = {{page}}::class;
 
     /**
      * @var string
