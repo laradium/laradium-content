@@ -88,8 +88,8 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     public function widgets()
     {
         $widgetRegistry = app(WidgetRegistry::class);
-        $widgets = $widgetRegistry->all()->mapWithKeys(function ($widget) {
-            return array_flip($widget);
+        $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
+            return [$model => $widget];
         })->toArray();
 
         $widgetList = [];

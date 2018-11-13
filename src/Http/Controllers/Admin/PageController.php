@@ -35,7 +35,7 @@ class PageController
     {
         $page = null;
         if (!$slug) {
-            $page = Page::with(['blocks.widget', 'content'])->whereIsHomepage(true)->first();
+            $page = Page::with(['blocks.block', 'content'])->whereIsHomepage(true)->first();
 
             if ($page && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
                     '/') !== $slug) {
