@@ -28,57 +28,39 @@ Class PageResource extends AbstractResource
      */
     public function resource()
     {
-        return laradium()->resource(function (FieldSet $set) {
-            $channelName = session()->get('channel');
-            $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
-            $channel = $channelRegistry->getChannelByName($channelName);
-            $channelInstance = new $channel;
+        $model = $this->getModel();
+        $channelName = request()->get('channel', 'main');
+        $channelModel = null;
+        if ($model->exists && $model->content_type) {
+            $channelModel = $model->content_type;
+        }
+        $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
+        $channels = $channelRegistry->all();
+        $channel = null;
+        if ($channelModel && $channel = $channels->where('model', $channelModel)->first()) {
+        } else {
+            $channel = $channels->where('name', $channelName)->first();
+        }
+        $channelInstance = new $channel['class'];
 
-            $set->text('title')->rules('required|max:255')->translatable();
-            $set->text('slug')->rules('max:255')->translatable();
-            $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
+        return laradium()->resource(function (FieldSet $set) use ($channelInstance) {
+            $set->tab('Main', 'asd')->fields(function (FieldSet $set) use ($channelInstance) {
+                $set->text('title')->rules('required|max:255')->translatable();
+                $set->text('slug')->rules('max:255')->translatable();
+                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
 
-            $set->boolean('is_active');
-            $set->boolean('is_homepage');
+                $set->boolean('is_active');
+                $set->boolean('is_homepage');
 
+                $channelInstance->fields($set);
+            });
             $set->tab('Meta')->fields(function (FieldSet $set) {
                 $set->text('meta_keywords')->translatable();
                 $set->text('meta_title')->translatable();
                 $set->text('meta_description')->translatable();
                 $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
             });
-
-            $channelInstance->fields($set);
         });
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        $channelName = str_plural(array_last(explode('/', request()->getRequestUri())));
-        session()->put('channel', $channelName);
-
-        return parent::create();
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function edit($id)
-    {
-        $page = Page::findOrFail($id);
-
-        if ($page->content_type) {
-            $channelName = str_plural(array_last(explode('\\', $page->content_type)));
-            session()->put('channel', strtolower($channelName));
-        } else {
-            session()->put('channel', 'mains');
-        }
-
-        return parent::edit($id);
     }
 
     /**
@@ -87,9 +69,7 @@ Class PageResource extends AbstractResource
     public function table()
     {
         $channelRegistry = app(\Laradium\Laradium\Content\Registries\ChannelRegistry::class);
-        $channels = $channelRegistry->all()->mapWithKeys(function ($item) {
-            return [str_singular(key($item)) => ucfirst(str_replace('-', ' ', str_singular(key($item))))];
-        });
+        $channels = $channelRegistry->all();
 
         $table = laradium()->table(function (ColumnSet $column) {
             $column->add('id', '#ID');
@@ -97,6 +77,7 @@ Class PageResource extends AbstractResource
                 return $item->is_active ? 'Yes' : 'No';
             });
             $column->add('title')->translatable();
+            $column->add('slug')->translatable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));

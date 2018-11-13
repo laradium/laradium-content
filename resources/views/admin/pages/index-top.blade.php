@@ -1,9 +1,9 @@
-<div class="row">
+<div class="row" id="channel-select">
     <div class="col-md-2">
         Create new page
         <select v-model="selectedPage" class="form-control">
-            @foreach($channels as $value => $channel)
-                <option value="{{ $value }}">{{ $channel }}</option>
+            @foreach($channels as $channel)
+                <option value="{{ $channel['name'] }}" @if($loop->iteration == 1) selected @endif>{{ ucfirst($channel['name']) }}</option>
             @endforeach
         </select>
     </div>

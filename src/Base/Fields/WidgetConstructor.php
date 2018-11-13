@@ -2,58 +2,55 @@
 
 namespace Laradium\Laradium\Content\Base\Fields;
 
-
-use Laradium\Laradium\Content\Registries\WidgetRegistry;
-use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
-use Laradium\Laradium\Base\Fields\Hidden;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Content\Models\ContentBlock;
+use Laradium\Laradium\Content\Registries\WidgetRegistry;
+use Laradium\Laradium\Traits\Relation;
+use Laradium\Laradium\Traits\Sortable;
+use Laradium\Laradium\Base\Fields\Hidden;
+use Laradium\Laradium\Base\Fields\MorphTo;
 
 class WidgetConstructor extends Field
 {
 
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    /**
-     * @var \Illuminate\Foundation\Application|mixed
-     */
-    protected $widgetRegistry;
+    use Sortable;
 
     /**
      * @var
      */
-    protected $fieldGroups;
+    private $fields;
 
     /**
-     * @var string
+     * @var
      */
-    protected $morphName;
+    private $fieldName;
 
     /**
-     * @var string
+     * @var
      */
-    protected $morphClass;
+    private $actions = ['create', 'delete'];
 
     /**
-     * @var string
+     * @var array
      */
-    protected $morphAttributeName;
-
-    /**
-     * @var string
-     */
-    protected $sortableColumn;
+    private $templateData = [];
 
     /**
      * @var bool
      */
-    protected $isSortable;
+    private $isCollapsed = true;
 
     /**
-     * WidgetConstructor constructor.
+     * @var string
+     */
+    private $entryLabel = 'name';
+    private $widgetRegistry;
+
+    /**
+     * HasMany constructor.
      * @param $parameters
      * @param Model $model
      */
@@ -61,260 +58,212 @@ class WidgetConstructor extends Field
     {
         parent::__construct($parameters, $model);
 
+        $this->fieldName('blocks');
         $this->widgetRegistry = app(WidgetRegistry::class);
-        $this->relationName = 'blocks';
-        $this->morphName = 'block';
-        $this->sortableColumn = 'sequence_no';
-        $this->isSortable = true;
     }
 
     /**
-     * @param array $parentAttributeList
-     * @param null $model
+     * @param array $attributes
      * @return $this|Field
      */
-    public function build($parentAttributeList = [], $model = null)
+    public function build($attributes = [])
     {
-        $this->parentAttributeList = $parentAttributeList;
-        $fieldList = [];
-        $rules = [];
-        $items = $this->relation()->orderBy('sequence_no')->get();
+        parent::build($attributes);
+        $this->sortable();
 
-        foreach ($items as $item) {
-            $widgetClass = $this->widgetRegistry->getByModel($item->block_type);
-            if (!$widgetClass) {
-                continue;
-            }
-            
-            $widget = new $widgetClass;
-            $fieldSet = new FieldSet;
-            $fieldSet->setModel($item);
-            $widget->fields($fieldSet);
-            $fields = $fieldSet->fields();
-            $model = new $item->block_type;
-            $model = $model->find($item->block_id);
-            $this->morphClass = $item->block_type;
-            $this->morphAttributeName = strtolower(array_last(explode('\\', $this->morphClass)));
-
-            $attributeList = array_merge($this->parentAttributeList, [
-                $this->relationName,
-                $item->id,
-            ]);
-
-            foreach ($fields as $field) {
-                $morphAttributeList = array_merge($this->parentAttributeList, [
-                    $this->relationName,
-                    $item->id,
-                    $this->morphAttributeName
-                ]);
-
-                $clonedField = clone $field;
-                $clonedField->setModel($model);
-                $clonedField->build($morphAttributeList, $model);
-
-                $fieldList[$item->id]['fields'][] = $clonedField;
-                $rules += $clonedField->getRules();
-            }
-
-            $fieldList[$item->id]['fields'][] = $this->createContentTypeField($this->morphClass, $morphAttributeList);
-            $fieldList[$item->id]['fields'][] = $this->createMorphNameField($this->morphClass, $morphAttributeList);
-            $fieldList[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
-
-            if ($this->isSortable()) {
-                $fieldList[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
-                $fieldList[$item->id][$this->sortableColumn] = $item->{$this->sortableColumn};
-            }
-
-            $fieldList[$item->id]['name'] = 'Widget - ' . str_singular(ucfirst(str_replace('_', ' ',
-                    $model->getTable())));
-        }
-
-        if ($rules) {
-            $this->validationRules = $rules;
-        }
-
-        $this->fieldGroups = $fieldList;
+        $this->templateData = $this->getTemplateData();
+        $this->validationRules($this->templateData['validation_rules']);
 
         return $this;
     }
 
     /**
-     * @param $model
-     * @param $attributeList
-     * @return Hidden
+     * @return array
      */
-    public function createSortableField($model, $attributeList)
+    public function formattedResponse()
     {
-        $field = new Hidden($this->sortableColumn, $model);
-        $field->build($attributeList);
-        $field->class('js-sortable-item');
-        $field->params([
-            'orderable' => true
-        ]);
+        $data = parent::formattedResponse();
+        $data['value'] = \Laradium\Laradium\Base\Fields\HasMany::class;
 
-        return $field;
-    }
+        $data['blocks'] = $this->getEntries();
+        $data['template_data'] = $this->templateData;
+        $data['config']['is_sortable'] = $this->isSortable();
+        $data['config']['actions'] = $this->getActions();
 
-    /**
-     * @param $morphClass
-     * @param $attributeList
-     * @return Hidden
-     */
-    public function createContentTypeField($morphClass, $attributeList)
-    {
-        $field = new Hidden('morph_type', $this->model);
-        $field->build($attributeList);
-        $field->setValue($morphClass);
-
-        return $field;
-    }
-
-    /**
-     * @param $morphClass
-     * @param $attributeList
-     * @return Hidden
-     */
-    public function createMorphNameField($morphClass, $attributeList)
-    {
-        $field = new Hidden('morph_name', $this->model);
-        $field->build($attributeList);
-        $field->setValue($this->morphName);
-
-        return $field;
-    }
-
-    /**
-     * @param $model
-     * @param $attributeList
-     * @return Hidden
-     */
-    public function createIdField($model, $attributeList)
-    {
-        $field = new Hidden('id', $model);
-        $field->build($attributeList);
-
-        return $field;
+        return $data;
     }
 
     /**
      * @return array
      */
-    public function template()
+    private function getTemplateData()
     {
-        $widgets = $this->widgetRegistry->all()->map(function ($item) {
-            return array_last(explode('\\', key($item)));
-        })->toArray();
+        $validationRules = [];
+        $blocks = [];
 
-        $templates = [];
-        $baseAttributeList = array_merge($this->parentAttributeList, [
-            $this->relationName,
-            '__ID__',
-        ]);
-
-        foreach ($this->widgetRegistry->all() as $widget) {
-            $widgetClass = key($widget);
-            $widgetName = array_last(explode('\\', $widgetClass));
+        $this->addReplacementAttribute();
+        $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
+        foreach ($this->widgetRegistry->all() as $widgetClass => $modelClass) {
+            $fields = [];
+            $model = new $modelClass;
             $widget = new $widgetClass;
-            $widgetModelClass = $widget->model();
-            $widgetModel = new $widgetModelClass;
-            $fieldSet = new FieldSet;
-            $fieldSet->setModel($widgetModel);
-            $widget->fields($fieldSet);
-            $fields = $fieldSet->fields();
-            $morphAttributeName = strtolower(array_last(explode('\\', $widgetModelClass)));
+            $item = new ContentBlock;
 
-            $attributeList = array_merge($this->parentAttributeList, [
-                $this->relationName,
-                '__ID__',
-                $morphAttributeName
-            ]);
-
-            foreach ($fields as $f) {
-                $field = clone $f;
-
-                $field->build($attributeList, null);
-                $field->isTemplate(true);
-                $field->setValue(null);
-
-                $templates[$widgetName]['fields'][] = $field->formattedResponse($field);
-            }
-
-            $contentTypeField = $this->createContentTypeField($widgetModelClass, $attributeList);
-            $morphNameField = $this->createMorphNameField($widgetModel, $attributeList);
-            $templates[$widgetName]['fields'][] = $contentTypeField->formattedResponse($contentTypeField);
-            $templates[$widgetName]['fields'][] = $morphNameField->formattedResponse($morphNameField);
-            $templates[$widgetName]['name'] = 'Widget - ' . ucfirst($morphAttributeName);
-            $templates[$widgetName]['isSortable'] = true;
             if ($this->isSortable()) {
-                $sortableField = $this->createSortableField($this->model, $baseAttributeList);
-                $templates[$widgetName]['fields'][] = $sortableField->formattedResponse($sortableField);
-                $templates[$widgetName][$this->sortableColumn] = 0;
+                $fields[] = (new Hidden('sequence_no', $item))
+                    ->replacementAttributes($this->getReplacementAttributes())
+                    ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                    ->value($item->count())
+                    ->formattedResponse(); // Add hidden sortable field
             }
 
-            $templates[$widgetName]['id'] = 0;
-            $templates[$widgetName]['show'] = false;
-            $templates[$widgetName]['order'] = 0;
-            $templates[$widgetName]['replacementIds'] = [];
-        }
+            $morphTo = (new MorphTo([get_class($model), 'block'], $item))
+                ->attributes(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->fields(function (FieldSet $set) use ($widget) {
+                    $widget->fields($set);
+                })
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->build();
 
-        return ([
-            'widgets'   => $widgets,
-            'templates' => $templates
-        ]);
-    }
+            if ($morphTo->getValidationRules()) {
+                $validationRules = array_merge($validationRules, $morphTo->getValidationRules());
+            }
 
-    /**
-     * @param null $field
-     * @return array
-     */
-    public function formattedResponse($field = null)
-    {
-        $items = [];
-        foreach ($this->fieldGroups as $id => $group) {
-            $item = [
-                'id'             => $id,
-                'name'           => $group['name'],
-                'replacementIds' => [],
-                'show'           => false,
-                'isSortable'     => $this->isSortable(),
-                'url'            => '/admin/content-block/' . $id
+            $fields[] = $morphTo->formattedResponse();
+
+            $blocks[] = [
+                'label'           => class_basename($widget),
+                'fields'          => $fields,
+                'replacement_ids' => $this->getReplacementAttributes(),
+                'config'          => [
+                    'is_deleted'   => false,
+                    'is_collapsed' => $this->isCollapsed(),
+                ],
             ];
-
-            if ($this->isSortable()) {
-                $item['order'] = $group[$this->sortableColumn];
-            }
-
-            foreach ($group['fields'] as $field) {
-                $item['fields'][] = $field->formattedResponse();
-            }
-
-            $items[] = $item;
         }
 
         return [
-            'type'        => 'widget-constructor',
-            'full_column' => true,
-            'name'        => $this->relationName,
-            'template'    => $this->template(),
-            'tab'         => $this->tab(),
-            'col'         => $this->col,
-            'items'       => $items
+            'label'            => 'Entry',
+            'blocks'           => $blocks,
+            'validation_rules' => $validationRules
         ];
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return array
      */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\HasMany
+    private function getEntries()
     {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
+        $entries = [];
+        foreach ($this->getModel()->blocks->sortBy($this->getSortableColumn()) as $item) {
+            $fields = [];
+            $model = $item->block;
+            $widgetClass = $this->widgetRegistry->getByModel($item->block_type);
+
+            if (!$widgetClass) {
+                continue;
+            }
+
+            $widget = new $widgetClass;
+
+            $fields[] = (new Hidden('id', $item))
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse(); // Add hidden ID field
+
+            if ($this->isSortable()) {
+                $fields[] = $this->sortableField($item); // Add hidden sortable field
+            }
+
+            $fields[] = (new MorphTo([get_class($model), 'block'], $item))
+                ->attributes(array_merge($this->getAttributes(), [$item->id]))
+                ->fields(function (FieldSet $set) use ($widget) {
+                    $widget->fields($set);
+                })
+                ->build()
+                ->formattedResponse();
+
+            $entries[] = [
+                'label'  => class_basename($widget),
+                'fields' => $fields,
+                'config' => [
+                    'is_deleted'   => false,
+                    'is_collapsed' => $this->isCollapsed(),
+                ],
+                'id'     => $item->id,
+            ];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @param $closure
+     * @return $this
+     */
+    public function fields($closure)
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->model($this->getModel());
+        $closure($fieldSet);
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function actions($value)
+    {
+        $this->actions = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function collapse($value)
+    {
+        $this->isCollapsed = $value;
+
+        return $this;
     }
 
     /**
      * @return bool
      */
-    public function isSortable()
+    public function isCollapsed()
     {
-        return $this->isSortable;
+        return $this->isCollapsed;
     }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function entryLabel($value)
+    {
+        $this->entryLabel = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntryLabel()
+    {
+        return $this->entryLabel;
+    }
+
 }

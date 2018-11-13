@@ -32,18 +32,23 @@ class ChannelRegistry
     }
 
     /**
-     * @param $channel
+     * @param $channelClass
      * @return $this
      */
-    public function register($channel)
+    public function register($channelClass)
     {
-        $name = $this->getName($channel);
+        $channel = new $channelClass;
+        $model = object_get($channel, 'model', null);
+        $name = $this->getName($channelClass);
         $this->channels->push([
-            $name => $channel
+            'class' => $channelClass,
+            'model' => $model,
+            'name'  => $name,
         ]);
 
         return $this;
     }
+
     /**
      * @param $channel
      * @return string
@@ -56,7 +61,7 @@ class ChannelRegistry
         $name = str_replace('Channel', '', $resourceName); // remove "Resource" from name
         $name = $pieces = preg_split('/(?=[A-Z])/', $name);
         unset($name[0]); // unset empty element
-        $name = str_plural(strtolower(implode('-', $name)));
+        $name = strtolower(implode('-', $name));
 
         return $name;
     }
@@ -75,10 +80,8 @@ class ChannelRegistry
      */
     public function getChannelByName($name)
     {
-        return $this->channels->filter(function ($item) use ($name) {
-            return $item[$name] ?? false;
-        })->map(function ($item) {
-            return array_first($item);
+        return $this->channels->filter(function ($class, $id) use ($name) {
+            return $id === $name;
         })->first();
     }
 }

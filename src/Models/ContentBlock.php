@@ -27,8 +27,8 @@ class ContentBlock extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function widget()
+    public function block()
     {
-        return $this->morphTo('block');
+        return $this->morphTo();
     }
 }
