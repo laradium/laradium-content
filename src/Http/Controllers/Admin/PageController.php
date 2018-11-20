@@ -7,6 +7,7 @@ use Laradium\Laradium\Content\Models\Page;
 
 class PageController
 {
+
     /**
      * @param $id
      * @return array
@@ -35,7 +36,10 @@ class PageController
     {
         $page = null;
         if (!$slug) {
-            $page = Page::with(['blocks.block', 'content'])->whereIsHomepage(true)->first();
+            $page = Page::with(['blocks.block', 'content'])
+                ->whereIsHomepage(true)
+                ->whereIsActive(true)
+                ->first();
 
             if ($page && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
                     '/') !== $slug) {
@@ -43,8 +47,9 @@ class PageController
             }
         } else {
             $locale = app()->getLocale();
-            $page = Page::with(['blocks.widget', 'content'])->whereHas('translations',
-                function ($q) use ($slug, $locale) {
+            $page = Page::with(['blocks.block', 'content'])
+                ->whereIsActive(true)
+                ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
         }
