@@ -23,10 +23,10 @@ class {{page}}Channel
      */
     public function fields(FieldSet $set)
     {
-        $set->morphsTo({{page}}::class, Page::class)->fields(function (FieldSet $set) {
+        $set->morphTo({{page}}::class, 'content')->fields(function (FieldSet $set) {
             $set->text('author');
             $set->wysiwyg('content')->translatable();
-        })->morphName('content');
+        });
 
         $set->widgetConstructor();
     }
