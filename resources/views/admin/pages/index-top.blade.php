@@ -1,4 +1,4 @@
-<div class="row" id="channel-select">
+<div class="row">
     <div class="col-md-2">
         Create new page
         <select v-model="selectedPage" class="form-control">
