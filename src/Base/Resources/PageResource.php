@@ -44,7 +44,7 @@ Class PageResource extends AbstractResource
         $channelInstance = new $channel['class'];
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance) {
-            $set->tab('Main', 'asd')->fields(function (FieldSet $set) use ($channelInstance) {
+            $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance) {
                 $set->text('title')->rules('required|max:255')->translatable();
                 $set->text('slug')->rules('max:255')->translatable();
                 $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
@@ -72,12 +72,11 @@ Class PageResource extends AbstractResource
         $channels = $channelRegistry->all();
 
         $table = laradium()->table(function (ColumnSet $column) {
-            $column->add('id', '#ID');
+            $column->add('title')->translatable();
+            $column->add('slug')->translatable();
             $column->add('is_active', 'Is Visible?')->modify(function ($item) {
                 return $item->is_active ? 'Yes' : 'No';
             });
-            $column->add('title')->translatable();
-            $column->add('slug')->translatable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
