@@ -2,16 +2,14 @@
 
 namespace Laradium\Laradium\Content\Base\Fields;
 
-use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Laradium\Laradium\Base\Field;
+use Laradium\Laradium\Base\Fields\Hidden;
+use Laradium\Laradium\Base\Fields\MorphTo;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\ContentBlock;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
-use Laradium\Laradium\Traits\Relation;
 use Laradium\Laradium\Traits\Sortable;
-use Laradium\Laradium\Base\Fields\Hidden;
-use Laradium\Laradium\Base\Fields\MorphTo;
 
 class WidgetConstructor extends Field
 {
@@ -47,6 +45,10 @@ class WidgetConstructor extends Field
      * @var string
      */
     private $entryLabel = 'name';
+
+    /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
     private $widgetRegistry;
 
     /**
@@ -132,7 +134,7 @@ class WidgetConstructor extends Field
             $fields[] = $morphTo->formattedResponse();
 
             $blocks[] = [
-                'label'           => class_basename($widget),
+                'label'           => $this->normalizeLabel(class_basename($widget)),
                 'fields'          => $fields,
                 'replacement_ids' => $this->getReplacementAttributes(),
                 'config'          => [
@@ -183,7 +185,7 @@ class WidgetConstructor extends Field
                 ->formattedResponse();
 
             $entries[] = [
-                'label'  => class_basename($widget),
+                'label'  => $this->normalizeLabel(class_basename($widget)),
                 'fields' => $fields,
                 'config' => [
                     'is_deleted'   => false,
@@ -264,6 +266,17 @@ class WidgetConstructor extends Field
     public function getEntryLabel()
     {
         return $this->entryLabel;
+    }
+
+    /**
+     * @param $label
+     * @return string|string[]|null
+     */
+    private function normalizeLabel($label)
+    {
+        $label = str_replace('Widget', '', $label);
+
+        return preg_replace('/(?<!\ )[A-Z]/', ' $0', $label);
     }
 
 }
