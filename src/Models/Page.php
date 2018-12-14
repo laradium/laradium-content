@@ -11,6 +11,7 @@ use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
+
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {
@@ -28,6 +29,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
      */
     protected $fillable = [
         'is_active',
+        'parent_id',
         'is_homepage',
         'meta_image',
         'layout',
@@ -80,6 +82,14 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     public function blocks()
     {
         return $this->hasMany(ContentBlock::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parent()
+    {
+        return $this->belongsTo(Page::class, 'parent_id');
     }
 
     /**
