@@ -105,10 +105,12 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         $widgetList = [];
         foreach ($this->blocks->sortBy('sequence_no') as $block) {
             $widget = $widgets[$block->block_type];
-            $widget = new $widget;
-            $widgetList[] = view($widget->view(), [
-                'widget' => $block->block
-            ]);
+            if ($widget) {
+                $widget = new $widget;
+                $widgetList[] = view($widget->view(), [
+                    'widget' => $block->block
+                ]);
+            }
         }
 
         return $widgetList;
