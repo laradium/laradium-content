@@ -41,26 +41,65 @@ class PageController
                 ->whereIsActive(true)
                 ->first();
 
+            abort_if(!$page, 404);
+
             if ($page && config('laradium-content.use_homepage_slug', false) && trim($page->slug,
                     '/') !== $slug) {
                 return redirect()->to($page->slug);
             }
-        } else {
+
+        }
+
+        if(!$page) {
             $locale = app()->getLocale();
             $page = Page::with(['blocks.block', 'content'])
                 ->whereIsActive(true)
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
+
+
+        }
+
+        $parentSlugs = $this->getParentSlugs($slug);
+        $hasPageAndParent = $page && $page->parent;
+
+        if($hasPageAndParent && $page->parent_slugs !== $parentSlugs) {
+            $page = null;
         }
 
         if (!$page) {
-            abort(404);
+            $page = Page::with(['blocks.block', 'content'])
+                ->whereIsActive(true)
+                ->whereHas('translations', function ($q) use ($slug, $locale) {
+                    $q->whereSlug(array_last(explode('/', $slug)))
+                        ->whereLocale($locale);
+                })->first();
+
+            $hasSameParent = $page->parent_slugs === $parentSlugs;
+
+            abort_if((!$page->parent || !$hasSameParent), 404);
         }
 
         $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts',
             ['layouts.main' => 'Main'])));
 
         return view('laradium-content::page', compact('page', 'layout'));
+    }
+
+    /**
+     * @param string $slug
+     * @return string
+     */
+    private function getParentSlugs($slug): string
+    {
+        $slugParts = explode('/', $slug);
+        if (count($slugParts) <= 1) {
+            return $slug;
+        }
+
+        unset($slugParts[count($slugParts) - 1]);
+
+        return implode($slugParts, '/');
     }
 }

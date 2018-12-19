@@ -58,6 +58,11 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     ];
 
     /**
+     * @var array
+     */
+    protected $with = ['parent'];
+
+    /**
      * Page constructor.
      * @param array $attributes
      */
@@ -95,7 +100,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     /**
      * @return array
      */
-    public function widgets()
+    public function widgets(): array
     {
         $widgetRegistry = app(WidgetRegistry::class);
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
@@ -112,6 +117,35 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         }
 
         return $widgetList;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParentSlugsAttribute(): string
+    {
+        $parent = $this->parent;
+        if ($parent) {
+            return implode('/', collect($this->getSlug($parent, []))->reverse()->toArray());
+        }
+
+        return '';
+    }
+
+    /**
+     * @param $parent
+     * @param array $slugs
+     * @return array
+     */
+    private function getSlug($parent, $slugs = []): array
+    {
+        if ($parent) {
+            $slugs[] = $parent->slug;
+
+            return $this->getSlug($parent->parent, $slugs);
+        }
+
+        return $slugs;
     }
 
     /**
