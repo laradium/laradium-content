@@ -45,18 +45,14 @@ Class PageResource extends AbstractResource
         $channelInstance = $this->getChannelInstance($model);
         $pages = $this->getPages();
 
-        $this->event('beforeSave', function ($model, $request) {
-            $this->handleParentSlugBeforeSave($model, $request);
-        });
-
-        $this->event('afterSave', function ($model, $request) {
-            $this->handleParentSlugAfterSave($model, $request);
-        });
-
-        return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages) {
-            $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $pages) {
+        return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
+            $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $pages, $model) {
                 $set->text('title')->rules('required|max:255')->translatable()->col(6);
-                $set->text('slug')->rules('max:255')->translatable()->col(6);
+                $set->text('slug')
+                    ->rules('max:255')
+                    ->translatable()
+                    ->col(6)
+                    ->label($this->getSlugLabel($model));
                 $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']))->col(6);
                 $set->select('parent_id')->options($pages)->label('Parent')->col(6);
                 $set->boolean('is_active')->col(6);
@@ -71,6 +67,24 @@ Class PageResource extends AbstractResource
                 $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
             });
         });
+    }
+
+    /**
+     * @param $model
+     * @return string
+     */
+    private function getSlugLabel($model): string
+    {
+        $slug = 'Slug';
+        if (!$model->exists) {
+            return $slug;
+        }
+
+        if ($model->parent) {
+            return $slug . ' (<small><b>pre slug</b> ' . $model->parent_slugs . '</small>)';
+        }
+
+        return $slug;
     }
 
     /**
@@ -110,74 +124,6 @@ Class PageResource extends AbstractResource
         $pages += $pageLsit;
 
         return $pages;
-    }
-
-    /**
-     * @param $model
-     * @param $request
-     * @return void
-     */
-    private function handleParentSlugAfterSave($model, $request): void
-    {
-        $parentId = $request->get('parent_id');
-        if (!$parentId) {
-            return;
-        }
-        $parent = Page::find($request->get('parent_id'));
-        foreach ($request->get('translations') as $locale => $translation) {
-            $slug = array_get($translation, 'slug');
-            $modelTranslations = $model->translations()->where('locale', $locale);
-            if (!$slug) {
-                $slug = $modelTranslations->first()->slug;
-            }
-            $parentTranslation = $parent->translations->where('locale', $locale)->first();
-            if ($parentTranslation && !str_contains($slug, $parentTranslation->slug)) {
-                $slug ?? str_slug(array_get($translation, 'title'));
-                $newSlug = sprintf('%s/%s', $parentTranslation->slug, $slug);
-                $model->translations()->where('locale', $locale)->update(['slug' => $newSlug]);
-            }
-        }
-    }
-
-    /**
-     * @param $model
-     * @param $request
-     * @return void
-     */
-    private function handleParentSlugBeforeSave($model, $request): void
-    {
-        $parentId = $request->get('parent_id');
-        if (!$model->parent_id || $parentId == $model->parent_id) {
-            return;
-        }
-        $model = Page::find($model->id);
-        $parent = Page::find($model->parent_id);
-        if (!$parent) {
-            return;
-        }
-        foreach ($model->translations()->get() as $translation) {
-            $slug = $translation->slug;
-            $locale = $translation->locale;
-
-            $parentTranslation = $parent->translations->where('locale', $locale)->first();
-            if (!$parentTranslation) {
-                continue;
-            }
-            if ($parentTranslation && str_contains($slug, $parentTranslation->slug)) {
-                $newSlug = str_replace($parentTranslation->slug . '/', '', $slug);
-                $translation->slug = $newSlug;
-                $translation->save();
-                $requestTranslations = $request->get('translations');
-                if ($translation = array_get($requestTranslations, $locale . '.slug')) {
-                    $requestTranslations[$locale]['slug'] = str_replace($parentTranslation->slug . '/', '',
-                        $translation);
-                    $request->merge([
-                        'translations' => $requestTranslations
-                    ]);
-                }
-
-            }
-        }
     }
 
     /**
