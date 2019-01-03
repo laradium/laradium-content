@@ -95,9 +95,7 @@ Class PageResource extends AbstractResource
         return laradium()->table(function (ColumnSet $column) {
             $column->add('title')->translatable();
             $column->add('slug')->translatable();
-            $column->add('is_active', 'Is Visible?')->modify(function ($item) {
-                return $item->is_active ? 'Yes' : 'No';
-            });
+            $column->add('is_active', 'Is Visible?')->switchable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
