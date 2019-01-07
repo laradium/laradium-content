@@ -76,6 +76,8 @@ class PageController
                         ->whereLocale($locale);
                 })->first();
 
+            abort_if(!$page, 404);
+
             $hasSameParent = $page->parent_slugs === $parentSlugs;
 
             abort_if((!$page->parent || !$hasSameParent), 404);
