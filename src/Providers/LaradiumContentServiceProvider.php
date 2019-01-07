@@ -2,8 +2,8 @@
 
 namespace Laradium\Laradium\Content\Providers;
 
-use Laradium\Laradium\Content\Console\Commands\MakeLaradiumChannel;
 use Illuminate\Support\ServiceProvider;
+use Laradium\Laradium\Content\Console\Commands\MakeLaradiumChannel;
 use Laradium\Laradium\Content\Console\Commands\MakeLaradiumWidget;
 use Laradium\Laradium\Content\Registries\ChannelRegistry;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
@@ -11,9 +11,11 @@ use Laradium\Laradium\Content\Registries\WidgetRegistry;
 class LaradiumContentServiceProvider extends ServiceProvider
 {
 
+    /**
+     * Boot method
+     */
     public function boot()
     {
-
         $configPath = __DIR__ . '/../../config/laradium-content.php';
         $this->mergeConfigFrom($configPath, 'laradium-content');
 
@@ -65,13 +67,14 @@ class LaradiumContentServiceProvider extends ServiceProvider
     }
 
     /**
+     * Get widgets
+     *
      * @return mixed
      */
     private function getWidgetList()
     {
-
         $widgetList = [];
-        $widgets = config('laradium-content.widget_path', []);
+        $widgets = config('laradium-content.widget_path', 'App\\Laradium\\Widgets');
         $namespace = app()->getNamespace();
         $widgetPath = str_replace($namespace, '', $widgets);
         $widgetPath = str_replace('\\', '/', $widgetPath);
@@ -85,11 +88,12 @@ class LaradiumContentServiceProvider extends ServiceProvider
             }
         }
 
-
         return $widgetList;
     }
 
     /**
+     * Get channels
+     *
      * @return mixed
      */
     private function getChannelList()
@@ -106,7 +110,7 @@ class LaradiumContentServiceProvider extends ServiceProvider
             }
         }
 
-        $channels = config('laradium-content.channel_path', []);
+        $channels = config('laradium-content.channel_path', 'App\\Laradium\\Channels');
         $namespace = app()->getNamespace();
         $channelPath = str_replace($namespace, '', $channels);
         $channelPath = str_replace('\\', '/', $channelPath);
