@@ -50,7 +50,7 @@ class PageController
 
         }
 
-        if(!$page) {
+        if (!$page) {
             $locale = app()->getLocale();
             $page = Page::with(['blocks.block', 'content'])
                 ->whereIsActive(true)
@@ -64,7 +64,7 @@ class PageController
         $parentSlugs = $this->getParentSlugs($slug);
         $hasPageAndParent = $page && $page->parent;
 
-        if($hasPageAndParent && $page->parent_slugs !== $parentSlugs) {
+        if ($hasPageAndParent && $page->parent_slugs !== $parentSlugs) {
             $page = null;
         }
 
@@ -91,7 +91,7 @@ class PageController
      * @param string $slug
      * @return string
      */
-    private function getParentSlugs($slug): string
+    private function getParentSlugs($slug): ?string
     {
         $slugParts = explode('/', $slug);
         if (count($slugParts) <= 1) {
