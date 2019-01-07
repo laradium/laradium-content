@@ -60,11 +60,13 @@ Class PageResource extends AbstractResource
 
                 $channelInstance->fields($set);
             });
-            $set->tab('Meta')->fields(function (FieldSet $set) {
+
+            $set->tab('SEO Meta')->fields(function (FieldSet $set) {
                 $set->text('meta_keywords')->translatable()->col(6);
                 $set->text('meta_title')->translatable()->col(6);
                 $set->textarea('meta_description')->translatable();
                 $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
+                $set->boolean('meta_noindex')->label('Noindex and nofollow for robots');
             });
         });
     }

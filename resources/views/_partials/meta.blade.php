@@ -86,6 +86,13 @@
             'name' => 'image',
             'value' => isset($page) && $page->meta_image->exists() ? $page->meta_image->url() : setting()->get('seo.meta_image')
         ],
+
+        // Robots
+        [
+            'attribute' => 'name',
+            'name' => 'robots',
+            'value' => isset($page) && $page->meta_noindex ? 'noindex,nofollow' : 'index,follow'
+        ]
     ]
 @endphp
 
