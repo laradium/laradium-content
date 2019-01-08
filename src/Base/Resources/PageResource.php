@@ -46,7 +46,7 @@ Class PageResource extends AbstractResource
         $pages = $this->getPages();
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
-            $set->block('col-md-9')->fields(function (FieldSet $set) use ($channelInstance, $model) {
+            $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
                 $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $model) {
                     $set->text('title')->rules('required|max:255')->translatable()->col(6);
                     $set->text('slug')
@@ -66,11 +66,11 @@ Class PageResource extends AbstractResource
                 });
             });
 
-            $set->block('col-md-3')->fields(function (FieldSet $set) use ($pages) {
+            $set->block(3)->fields(function (FieldSet $set) use ($pages) {
                 $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
                 $set->select('parent_id')->options($pages)->label('Parent');
-                $set->boolean('is_active');
-                $set->boolean('is_homepage');
+                $set->boolean('is_active')->col(6);
+                $set->boolean('is_homepage')->col(6);
             });
         });
     }
