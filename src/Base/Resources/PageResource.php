@@ -104,10 +104,33 @@ Class PageResource extends AbstractResource
                 return 'Main';
             });
         })
+            ->tabs([
+                'content_type' => $this->getTabs()
+            ])
             ->relations(['translations'])
             ->additionalView('laradium-content::admin.pages.index-top', [
                 'channels' => $this->channelRegistry->all()
             ]);
+    }
+
+    /**
+     * @return array
+     */
+    private function getTabs(): array
+    {
+        $tabs = ['all' => 'All'];
+        $availableTabs = Page::select('content_type')
+            ->groupBy('content_type')
+            ->get()
+            ->mapWithKeys(function ($page) {
+                $tab = $page->content_type ? array_last(explode('\\', $page->content_type)) : 'Main';
+
+                return [
+                    $page->content_type => $tab
+                ];
+            })->toArray();
+
+        return array_merge($tabs, $availableTabs);
     }
 
     /**
