@@ -58,11 +58,12 @@ Class PageResource extends AbstractResource
                     $channelInstance->fields($set);
                 });
 
-                $set->tab('Meta')->fields(function (FieldSet $set) {
+                $set->tab('SEO Meta')->fields(function (FieldSet $set) {
                     $set->text('meta_keywords')->translatable()->col(6);
                     $set->text('meta_title')->translatable()->col(6);
                     $set->textarea('meta_description')->translatable();
                     $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
+                    $set->boolean('meta_noindex')->label('Noindex and nofollow for robots');
                 });
             });
 
@@ -101,6 +102,11 @@ Class PageResource extends AbstractResource
         return laradium()->table(function (ColumnSet $column) {
             $column->add('title')->translatable();
             $column->add('slug')->translatable();
+
+            $column->add('seo_optimized')->modify(function ($item) {
+                return $this->checkSeoStatus($item);
+            })->notSortable();
+
             $column->add('is_active', 'Is Visible?')->switchable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
@@ -110,33 +116,10 @@ Class PageResource extends AbstractResource
                 return 'Main';
             });
         })
-            ->tabs([
-                'content_type' => $this->getTabs()
-            ])
             ->relations(['translations'])
             ->additionalView('laradium-content::admin.pages.index-top', [
                 'channels' => $this->channelRegistry->all()
             ]);
-    }
-
-    /**
-     * @return array
-     */
-    private function getTabs(): array
-    {
-        $tabs = ['all' => 'All'];
-        $availableTabs = Page::select('content_type')
-            ->groupBy('content_type')
-            ->get()
-            ->mapWithKeys(function ($page) {
-                $tab = $page->content_type ? array_last(explode('\\', $page->content_type)) : 'Main';
-
-                return [
-                    $page->content_type => $tab
-                ];
-            })->toArray();
-
-        return array_merge($tabs, $availableTabs);
     }
 
     /**
@@ -183,5 +166,59 @@ Class PageResource extends AbstractResource
         }
 
         return $channelRegistry->where('name', $channelName)->first();
+    }
+
+    /**
+     * Get overall SEO status based on filled/empty SEO values.
+     *
+     * @param \Laradium\Laradium\Content\Models\Page $item
+     * @return string
+     */
+    private function checkSeoStatus(Page $item): string
+    {
+        $nonTranslatableSeoFields = ['meta_image_file_name'];
+        $translatableSeoFields = ['meta_keywords', 'meta_title', 'meta_description'];
+
+        $translationsCount = $item->translations->count();
+        $totalSeoFields = $translationsCount * count($translatableSeoFields) + count($nonTranslatableSeoFields);
+        $percentPerField = 100 / $totalSeoFields;
+        $score = 0;
+
+        foreach ($nonTranslatableSeoFields as $nonTranslatableSeoField) {
+            if ($item->{$nonTranslatableSeoField}) {
+                $score += $percentPerField;
+            }
+        }
+
+        foreach ($item->translations as $translation) {
+            foreach ($translatableSeoFields as $translatableSeoField) {
+                if ($translation->{$translatableSeoField}) {
+                    $score += $percentPerField;
+                }
+            }
+        }
+
+        if ($score > 100) {
+            $score = 100;
+        }
+
+        if ($score >= 95) {
+            $labelClass = 'badge-success';
+            $labelText = 'Very good';
+        } else if($score >= 70) {
+            $labelClass = 'badge-info';
+            $labelText = 'Good';
+        } else if($score >= 50) {
+            $labelClass = 'badge-warning';
+            $labelText = 'Average';
+        } else if($score >= 40) {
+            $labelClass = 'badge-danger';
+            $labelText = 'Bad';
+        } else {
+            $labelClass = 'badge-danger';
+            $labelText = 'Very bad';
+        }
+
+        return '<label class="badge ' . $labelClass . '">' . $labelText . ' (' . (int)$score . '%)</label>';
     }
 }
