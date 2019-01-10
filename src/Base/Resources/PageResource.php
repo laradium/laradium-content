@@ -46,25 +46,31 @@ Class PageResource extends AbstractResource
         $pages = $this->getPages();
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
-            $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $pages, $model) {
-                $set->text('title')->rules('required|max:255')->translatable()->col(6);
-                $set->text('slug')
-                    ->rules('max:255')
-                    ->translatable()
-                    ->col(6)
-                    ->label($this->getSlugLabel($model));
-                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']))->col(6);
-                $set->select('parent_id')->options($pages)->label('Parent')->col(6);
+            $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                    $set->text('title')->rules('required|max:255')->translatable()->col(6);
+                    $set->text('slug')
+                        ->rules('max:255')
+                        ->translatable()
+                        ->col(6)
+                        ->label($this->getSlugLabel($model));
+
+                    $channelInstance->fields($set);
+                });
+
+                $set->tab('Meta')->fields(function (FieldSet $set) {
+                    $set->text('meta_keywords')->translatable()->col(6);
+                    $set->text('meta_title')->translatable()->col(6);
+                    $set->textarea('meta_description')->translatable();
+                    $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
+                });
+            });
+
+            $set->block(3)->fields(function (FieldSet $set) use ($pages) {
+                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
+                $set->select('parent_id')->options($pages)->label('Parent');
                 $set->boolean('is_active')->col(6);
                 $set->boolean('is_homepage')->col(6);
-
-                $channelInstance->fields($set);
-            });
-            $set->tab('Meta')->fields(function (FieldSet $set) {
-                $set->text('meta_keywords')->translatable()->col(6);
-                $set->text('meta_title')->translatable()->col(6);
-                $set->textarea('meta_description')->translatable();
-                $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
             });
         });
     }
