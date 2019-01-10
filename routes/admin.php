@@ -20,7 +20,3 @@ Route::group([
         'as'   => 'pages.edit'
     ]);
 });
-
-//Route::get('/{slug?}', [
-//    'uses' => '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@resolve'
-//])->middleware('web');
