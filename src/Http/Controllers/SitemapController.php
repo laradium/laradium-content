@@ -48,11 +48,18 @@ class SitemapController
 
         $pages = $query->get();
 
-        return $pages->map(function ($page) {
+        $urls = $pages->map(function ($page) {
             return (object)[
                 'url'        => url($page->slug),
                 'updated_at' => explode(' ', $page->updated_at)[0],
             ];
         });
+
+        $urls->prepend((object)[
+            'url'        => url('/'),
+            'updated_at' => date('Y-m-d', strtotime('today')),
+        ]);
+
+        return $urls;
     }
 }
