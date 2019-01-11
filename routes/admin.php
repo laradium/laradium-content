@@ -21,6 +21,8 @@ Route::group([
     ]);
 });
 
+Route::get('sitemap.xml', 'Laradium\Laradium\Content\Http\Controllers\SitemapController@index');
+
 //Route::get('/{slug?}', [
 //    'uses' => '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@resolve'
 //])->middleware('web');
