@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Models;
 
+use Czim\Paperclip\Contracts\AttachableInterface;
 use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,8 +10,13 @@ use Laradium\Laradium\Content\Models\Translations\PageTranslation;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
 use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
-class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
+class Page extends Model implements AttachableInterface
 {
+
+    /**
+     * @string
+     */
+    public const CACHE_KEY = 'laradium::pages';
 
     use PaperclipTrait, PaperclipAndTranslatable;
 
@@ -60,7 +66,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     /**
      * @var array
      */
-    protected $with = ['parent'];
+    protected $with = ['translations'];
 
     /**
      * Page constructor.
@@ -99,6 +105,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function widgets(): array
     {
@@ -106,19 +113,24 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
             return [$model => $widget];
         })->toArray();
+        $blocks = $this->blocks;
 
-        $widgetList = [];
-        foreach ($this->blocks->sortBy('sequence_no') as $block) {
-            $widget = $widgets[$block->block_type];
-            if ($widget) {
-                $widget = new $widget;
-                $widgetList[] = view($widget->view(), [
-                    'widget' => $block->block
-                ]);
+        return cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
+            $widgetList = [];
+
+            foreach ($blocks->load('block')->sortBy('sequence_no') as $block) {
+                $widget = $widgets[$block->block_type];
+                if ($widget) {
+                    $widget = new $widget;
+                    $widgetList[] = [
+                        'view' => $widget->view(),
+                        'block' => $block->block
+                    ];
+                }
             }
-        }
 
-        return $widgetList;
+            return $widgetList;
+        });
     }
 
     /**
@@ -148,6 +160,14 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         }
 
         return $slugs;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheKey(): string
+    {
+        return self::CACHE_KEY . '_' . $this->id;
     }
 
     /**
