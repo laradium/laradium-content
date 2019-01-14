@@ -128,13 +128,14 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
             $widgetList = [];
 
-            foreach ($blocks->sortBy('sequence_no') as $block) {
+            foreach ($blocks->load('block')->sortBy('sequence_no') as $block) {
                 $widget = $widgets[$block->block_type];
                 if ($widget) {
                     $widget = new $widget;
-                    $widgetList[] = view($widget->view(), [
-                        'widget' => $block->block
-                    ])->render();
+                    $widgetList[] = [
+                        'view' => $widget->view(),
+                        'block' => $block->block
+                    ];
                 }
             }
 
