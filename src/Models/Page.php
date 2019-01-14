@@ -15,7 +15,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     /**
      * @string
      */
-    public const PAGE_CACHE_KEY = 'laradium::pages';
+    public const CACHE_KEY = 'laradium::pages';
 
     use PaperclipTrait, PaperclipAndTranslatable;
 
@@ -177,7 +177,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
      */
     public function getCacheKey(): string
     {
-        return self::PAGE_CACHE_KEY . '_' . $this->id;
+        return self::CACHE_KEY . '_' . $this->id;
     }
 
     /**
