@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
+use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
@@ -101,7 +102,17 @@ Class PageResource extends AbstractResource
     {
         return laradium()->table(function (ColumnSet $column) {
             $column->add('title')->translatable();
-            $column->add('slug')->translatable();
+
+            if (Route::has('page.resolve')) {
+                $column->add('slug')->modify(function ($item) {
+                    return view('laradium-content::admin.pages._partials.slug', [
+                        'item'   => $item,
+                        'column' => 'slug'
+                    ])->render();
+                })->notSortable()->notSearchable();
+            } else {
+                $column->add('slug')->translatable();
+            }
 
             $column->add('seo_optimized')->modify(function ($item) {
                 return $this->checkSeoStatus($item);

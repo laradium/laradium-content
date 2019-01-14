@@ -140,3 +140,16 @@ class HiwWidget extends AbstractWidget
 ```
 
 You can specify your fields under `fields` method.
+
+# Page resolver 
+
+To actually return created pages, you need to add the page resolver route at the end of your routes file, or to your `RouteServiceProvider.php` file.
+
+To do this, you can simply use the helper method `content()->pageRoute()`, or you can create your own route, but as the resolver route is configurable, there shouldn't be a need for that.
+
+The config file, provides you with some options, to change the behaviour of the page resolver, in case you need some customization.
+
+- `middlewares` - Change what middlewares the resolver route will use
+- `custom_uri` - Provides you with an option, to define a function name, that will return a custom uri
+- `prepend_locale` - Adds an iso code to the uri. So the url `https://example.com/my-cool-page` will become `https://example.com/en/my-cool-page`
+- `uses` - Defines, what controller and method will be used to actually resolve the route. 
