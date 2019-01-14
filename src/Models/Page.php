@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Models;
 
+use Czim\Paperclip\Contracts\AttachableInterface;
 use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Laradium\Laradium\Content\Models\Translations\PageTranslation;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
 use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
-class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
+class Page extends Model implements AttachableInterface
 {
 
     /**
