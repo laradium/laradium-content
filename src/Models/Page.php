@@ -12,6 +12,11 @@ use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
 
+    /**
+     * @string
+     */
+    public const PAGE_CACHE_KEY = 'laradium::pages';
+
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {
@@ -60,7 +65,7 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
     /**
      * @var array
      */
-    protected $with = ['parent'];
+    protected $with = ['translations'];
 
     /**
      * Page constructor.
@@ -99,26 +104,42 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function widgets(): array
+    {
+        $this->cacheWidgets();
+
+        return cache()->get($this->getCacheKey(), []);
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    public function cacheWidgets()
     {
         $widgetRegistry = app(WidgetRegistry::class);
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
             return [$model => $widget];
         })->toArray();
+        $blocks = $this->blocks;
 
-        $widgetList = [];
-        foreach ($this->blocks->sortBy('sequence_no') as $block) {
-            $widget = $widgets[$block->block_type];
-            if ($widget) {
-                $widget = new $widget;
-                $widgetList[] = view($widget->view(), [
-                    'widget' => $block->block
-                ]);
+        cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
+            $widgetList = [];
+
+            foreach ($blocks->sortBy('sequence_no') as $block) {
+                $widget = $widgets[$block->block_type];
+                if ($widget) {
+                    $widget = new $widget;
+                    $widgetList[] = view($widget->view(), [
+                        'widget' => $block->block
+                    ])->render();
+                }
             }
-        }
 
-        return $widgetList;
+            return $widgetList;
+        });
     }
 
     /**
@@ -148,6 +169,14 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
         }
 
         return $slugs;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheKey(): string
+    {
+        return self::PAGE_CACHE_KEY . '_' . $this->id;
     }
 
     /**

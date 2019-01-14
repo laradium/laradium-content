@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
-use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
@@ -45,6 +44,10 @@ Class PageResource extends AbstractResource
         $model = $this->getModel();
         $channelInstance = $this->getChannelInstance($model);
         $pages = $this->getPages();
+
+        $this->event(['afterSave', 'afterDelete'], function ($model) {
+            cache()->forget($model->getCacheKey());
+        });
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
             $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
@@ -130,7 +133,6 @@ Class PageResource extends AbstractResource
             ->tabs([
                 'content_type' => $this->getTabs()
             ])
-            ->relations(['translations'])
             ->additionalView('laradium-content::admin.pages.index-top', [
                 'channels' => $this->channelRegistry->all()
             ]);
@@ -147,10 +149,12 @@ Class PageResource extends AbstractResource
             ->get()
             ->mapWithKeys(function ($page) {
                 $tab = $page->content_type ? array_last(explode('\\', $page->content_type)) : 'Main';
+
                 return [
                     $page->content_type => $tab
                 ];
             })->toArray();
+
         return array_merge($tabs, $availableTabs);
     }
 
@@ -237,13 +241,13 @@ Class PageResource extends AbstractResource
         if ($score >= 95) {
             $labelClass = 'badge-success';
             $labelText = 'Very good';
-        } else if($score >= 70) {
+        } elseif($score >= 70) {
             $labelClass = 'badge-info';
             $labelText = 'Good';
-        } else if($score >= 50) {
+        } elseif($score >= 50) {
             $labelClass = 'badge-warning';
             $labelText = 'Average';
-        } else if($score >= 40) {
+        } elseif($score >= 40) {
             $labelClass = 'badge-danger';
             $labelText = 'Bad';
         } else {

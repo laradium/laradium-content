@@ -45,8 +45,7 @@ class PageController
 
         $page = null;
         if (!$slug) {
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsHomepage(true)
+            $page = Page::whereIsHomepage(true)
                 ->whereIsActive(true)
                 ->first();
 
@@ -60,8 +59,7 @@ class PageController
 
         if (!$page) {
             $locale = app()->getLocale();
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsActive(true)
+            $page = Page::whereIsActive(true)
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
@@ -75,8 +73,7 @@ class PageController
         }
 
         if (!$page) {
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsActive(true)
+            $page = Page::whereIsActive(true)
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug(array_last(explode('/', $slug)))
                         ->whereLocale($locale);
