@@ -47,25 +47,32 @@ Class PageResource extends AbstractResource
         $pages = $this->getPages();
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
-            $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $pages, $model) {
-                $set->text('title')->rules('required|max:255')->translatable()->col(6);
-                $set->text('slug')
-                    ->rules('max:255')
-                    ->translatable()
-                    ->col(6)
-                    ->label($this->getSlugLabel($model));
-                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']))->col(6);
-                $set->select('parent_id')->options($pages)->label('Parent')->col(6);
+            $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                    $set->text('title')->rules('required|max:255')->translatable()->col(6);
+                    $set->text('slug')
+                        ->rules('max:255')
+                        ->translatable()
+                        ->col(6)
+                        ->label($this->getSlugLabel($model));
+
+                    $channelInstance->fields($set);
+                });
+
+                $set->tab('SEO Meta')->fields(function (FieldSet $set) {
+                    $set->text('meta_keywords')->translatable()->col(6);
+                    $set->text('meta_title')->translatable()->col(6);
+                    $set->textarea('meta_description')->translatable();
+                    $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
+                    $set->boolean('meta_noindex')->label('Noindex and nofollow for robots');
+                });
+            });
+
+            $set->block(3)->fields(function (FieldSet $set) use ($pages) {
+                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
+                $set->select('parent_id')->options($pages)->label('Parent');
                 $set->boolean('is_active')->col(6);
                 $set->boolean('is_homepage')->col(6);
-
-                $channelInstance->fields($set);
-            });
-            $set->tab('Meta')->fields(function (FieldSet $set) {
-                $set->text('meta_keywords')->translatable()->col(6);
-                $set->text('meta_title')->translatable()->col(6);
-                $set->textarea('meta_description')->translatable();
-                $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
             });
         });
     }
@@ -107,6 +114,10 @@ Class PageResource extends AbstractResource
                 $column->add('slug')->translatable();
             }
 
+            $column->add('seo_optimized')->modify(function ($item) {
+                return $this->checkSeoStatus($item);
+            })->notSortable();
+
             $column->add('is_active', 'Is Visible?')->switchable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
@@ -136,12 +147,10 @@ Class PageResource extends AbstractResource
             ->get()
             ->mapWithKeys(function ($page) {
                 $tab = $page->content_type ? array_last(explode('\\', $page->content_type)) : 'Main';
-
                 return [
                     $page->content_type => $tab
                 ];
             })->toArray();
-
         return array_merge($tabs, $availableTabs);
     }
 
@@ -189,5 +198,59 @@ Class PageResource extends AbstractResource
         }
 
         return $channelRegistry->where('name', $channelName)->first();
+    }
+
+    /**
+     * Get overall SEO status based on filled/empty SEO values.
+     *
+     * @param \Laradium\Laradium\Content\Models\Page $item
+     * @return string
+     */
+    private function checkSeoStatus(Page $item): string
+    {
+        $nonTranslatableSeoFields = ['meta_image_file_name'];
+        $translatableSeoFields = ['meta_keywords', 'meta_title', 'meta_description'];
+
+        $translationsCount = $item->translations->count();
+        $totalSeoFields = $translationsCount * count($translatableSeoFields) + count($nonTranslatableSeoFields);
+        $percentPerField = 100 / $totalSeoFields;
+        $score = 0;
+
+        foreach ($nonTranslatableSeoFields as $nonTranslatableSeoField) {
+            if ($item->{$nonTranslatableSeoField}) {
+                $score += $percentPerField;
+            }
+        }
+
+        foreach ($item->translations as $translation) {
+            foreach ($translatableSeoFields as $translatableSeoField) {
+                if ($translation->{$translatableSeoField}) {
+                    $score += $percentPerField;
+                }
+            }
+        }
+
+        if ($score > 100) {
+            $score = 100;
+        }
+
+        if ($score >= 95) {
+            $labelClass = 'badge-success';
+            $labelText = 'Very good';
+        } else if($score >= 70) {
+            $labelClass = 'badge-info';
+            $labelText = 'Good';
+        } else if($score >= 50) {
+            $labelClass = 'badge-warning';
+            $labelText = 'Average';
+        } else if($score >= 40) {
+            $labelClass = 'badge-danger';
+            $labelText = 'Bad';
+        } else {
+            $labelClass = 'badge-danger';
+            $labelText = 'Very bad';
+        }
+
+        return '<label class="badge ' . $labelClass . '">' . $labelText . ' (' . (int)$score . '%)</label>';
     }
 }
