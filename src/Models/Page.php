@@ -108,24 +108,13 @@ class Page extends Model implements \Czim\Paperclip\Contracts\AttachableInterfac
      */
     public function widgets(): array
     {
-        $this->cacheWidgets();
-
-        return cache()->get($this->getCacheKey(), []);
-    }
-
-    /**
-     * @return void
-     * @throws \Exception
-     */
-    public function cacheWidgets()
-    {
         $widgetRegistry = app(WidgetRegistry::class);
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
             return [$model => $widget];
         })->toArray();
         $blocks = $this->blocks;
 
-        cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
+        return cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
             $widgetList = [];
 
             foreach ($blocks->load('block')->sortBy('sequence_no') as $block) {
