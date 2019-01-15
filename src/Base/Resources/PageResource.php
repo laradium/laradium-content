@@ -2,12 +2,13 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
+use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\Page;
 use \Laradium\Laradium\Content\Registries\ChannelRegistry;
-use Route;
+use Laradium\Laradium\Models\Language;
 
 Class PageResource extends AbstractResource
 {
@@ -52,6 +53,7 @@ Class PageResource extends AbstractResource
         });
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
+
             $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
                 $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $model) {
                     $set->text('title')->rules('required|max:255')->translatable()->col(6);
@@ -73,13 +75,30 @@ Class PageResource extends AbstractResource
                 });
             });
 
-            $set->block(3)->fields(function (FieldSet $set) use ($pages) {
+            $set->block(3)->fields(function (FieldSet $set) use ($pages, $model) {
+                $set->languageSelect();
+
                 $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
                 $set->select('parent_id')->options($pages)->label('Parent');
                 $set->boolean('is_active')->col(6);
                 $set->boolean('is_homepage')->col(6);
-            });
-        });
+
+                $set->saveButtons()->fields(function (FieldSet $set) use ($model) {
+                    if ($model->exists) {
+                        $set->link('Preview', 'javascript:;')->attributes([
+                            'id'         => 'preview-page',
+                            'class'      => 'btn btn-primary',
+                            'target'     => '_blank',
+                            'data-links' => json_encode($this->getPageLinks($model))
+                        ]);
+                    }
+                })->withoutLanguageSelect();
+            })->attributes([
+                'id' => 'page-sidebar'
+            ]);
+        })->js([
+            asset('laradium/assets/js/page.js')
+        ]);
     }
 
     /**
@@ -243,13 +262,13 @@ Class PageResource extends AbstractResource
         if ($score >= 95) {
             $labelClass = 'badge-success';
             $labelText = 'Very good';
-        } elseif($score >= 70) {
+        } elseif ($score >= 70) {
             $labelClass = 'badge-info';
             $labelText = 'Good';
-        } elseif($score >= 50) {
+        } elseif ($score >= 50) {
             $labelClass = 'badge-warning';
             $labelText = 'Average';
-        } elseif($score >= 40) {
+        } elseif ($score >= 40) {
             $labelClass = 'badge-danger';
             $labelText = 'Bad';
         } else {
@@ -258,5 +277,37 @@ Class PageResource extends AbstractResource
         }
 
         return '<label class="badge ' . $labelClass . '">' . $labelText . ' (' . (int)$score . '%)</label>';
+    }
+
+    /**
+     * @param Page $model
+     * @return array
+     */
+    private function getPageLinks(Page $model): array
+    {
+        $prependLocale = config('laradium-content.resolver.prepend_locale', false);
+
+        $links = [];
+        foreach (translate()->languages() as $language) {
+            $translation = $model->translations->where('locale', $language->iso_code)->first();
+
+            if (!$translation) {
+                continue;
+            }
+
+            $preSlug = '';
+            if ($model->parent && get_class($model) === Page::class) {
+                $preSlug = $model->getParentSlugsByLocale($model->parent, $language->iso_code) . '/';
+            }
+
+            if ($translation->slug) {
+                $links[] = [
+                    'iso_code' => $language->iso_code,
+                    'url'      => url($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug)
+                ];
+            }
+        }
+
+        return $links;
     }
 }
