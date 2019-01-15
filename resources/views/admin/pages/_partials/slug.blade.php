@@ -8,10 +8,16 @@
     @endphp
     @if($translation->{$column})
         <li>
+            @php
+                $preSlug = '';
+                if(get_class($item) === \Laradium\Laradium\Content\Models\Page::class && $item->parent) {
+                    $preSlug = $item->getParentSlugsByLocale($item->parent, $language->iso_code) . '/';
+                }
+            @endphp
             <b>{{ strtoupper($language->iso_code) }}: </b>
-            <a href="{{ url($prependLocale ? $language->iso_code.'/'.$translation->{$column} : $translation->{$column}) }}"
+            <a href="{{ url($prependLocale ? $language->iso_code.'/'.$preSlug.$translation->{$column} : $preSlug.$translation->{$column}) }}"
                target="_blank">
-                {{ $translation->{$column} }}
+                {{ $preSlug.$translation->{$column} }}
             </a>
         </li>
     @else

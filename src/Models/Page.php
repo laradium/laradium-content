@@ -138,20 +138,15 @@ class Page extends Model implements AttachableInterface
      */
     public function getParentSlugsAttribute(): string
     {
-        $parent = $this->parent;
-        if ($parent) {
-            return implode('/', collect($this->getSlug($parent, []))->reverse()->toArray());
-        }
-
-        return '';
+        return $this->getSlug($this->parent);
     }
 
     /**
      * @param $parent
      * @param array $slugs
-     * @return array
+     * @return string
      */
-    private function getSlug($parent, $slugs = []): array
+    public function getSlug($parent, $slugs = []): string
     {
         if ($parent) {
             $slugs[] = $parent->slug;
@@ -159,7 +154,32 @@ class Page extends Model implements AttachableInterface
             return $this->getSlug($parent->parent, $slugs);
         }
 
-        return $slugs;
+        if ($slugs) {
+            return implode('/', collect($slugs)->reverse()->toArray());
+        }
+
+        return '';
+    }
+
+    /**
+     * @param $parent
+     * @param $locale
+     * @param array $slugs
+     * @return string
+     */
+    public function getParentSlugsByLocale($parent, $locale, $slugs = []): string
+    {
+        if ($parent) {
+            $slugs[] = $parent->translate($locale)->slug;
+
+            return $this->getSlug($parent->parent, $slugs);
+        }
+
+        if ($slugs) {
+            return implode('/', collect($slugs)->reverse()->toArray());
+        }
+
+        return '';
     }
 
     /**

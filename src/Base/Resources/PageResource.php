@@ -7,6 +7,7 @@ use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\Page;
 use \Laradium\Laradium\Content\Registries\ChannelRegistry;
+use Route;
 
 Class PageResource extends AbstractResource
 {
@@ -42,6 +43,7 @@ Class PageResource extends AbstractResource
     public function resource()
     {
         $model = $this->getModel();
+
         $channelInstance = $this->getChannelInstance($model);
         $pages = $this->getPages();
 
@@ -119,7 +121,7 @@ Class PageResource extends AbstractResource
 
             $column->add('seo_optimized')->modify(function ($item) {
                 return $this->checkSeoStatus($item);
-            })->notSortable();
+            })->notSortable()->notSearchable();
 
             $column->add('is_active', 'Is Visible?')->switchable();
             $column->add('content_type', 'Type')->modify(function ($item) {
