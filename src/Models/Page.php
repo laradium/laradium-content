@@ -123,7 +123,7 @@ class Page extends Model implements AttachableInterface
                 if ($widget) {
                     $widget = new $widget;
                     $widgetList[] = [
-                        'view' => $widget->view(),
+                        'view'  => $widget->view(),
                         'block' => $block->block
                     ];
                 }
@@ -188,6 +188,40 @@ class Page extends Model implements AttachableInterface
     public function getCacheKey(): string
     {
         return self::CACHE_KEY . '_' . $this->id;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function getParentsAttribute()
+    {
+        $parents = collect([]);
+
+        $parent = $this->parent;
+
+        while (!is_null($parent)) {
+            $parents->push($parent);
+            $parent = $parent->parent;
+        }
+
+        return $parents;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function getBreadcrumbsAttribute()
+    {
+        $breadcrumbs = collect([]);
+
+        foreach ($this->parents->reverse() as $parent) {
+            $breadcrumbs->push((object)[
+                'title' => $parent->title,
+                'slug'  => implode('/', $breadcrumbs->pluck('slug')->toArray()) . '/' . $parent->slug
+            ]);
+        }
+
+        return $breadcrumbs;
     }
 
     /**
