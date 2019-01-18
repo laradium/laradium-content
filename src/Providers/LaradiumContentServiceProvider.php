@@ -17,11 +17,17 @@ class LaradiumContentServiceProvider extends ServiceProvider
     public function boot()
     {
         $configPath = __DIR__ . '/../../config/laradium-content.php';
+        $assetPath = __DIR__ . '/../../public/laradium';
         $this->mergeConfigFrom($configPath, 'laradium-content');
 
         $this->publishes([
             $configPath => config_path('laradium-content.php'),
+            $assetPath  => public_path('laradium')
         ], 'laradium-content');
+
+        $this->publishes([
+            $assetPath  => public_path('laradium')
+        ], 'laradium-content-assets');
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium-content');
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');

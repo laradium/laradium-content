@@ -1,6 +1,8 @@
 @extends($layout)
 @section('content')
     @foreach($page->widgets() as $widget)
-        {!! $widget->render() !!}
+        {!! view($widget['view'], [
+            'widget' => $widget['block']
+        ]) !!}
     @endforeach
 @endsection

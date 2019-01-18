@@ -29,15 +29,23 @@ class PageController
     }
 
     /**
+     * @param null $locale
      * @param null $slug
      * @return mixed
      */
-    public function resolve($slug = null)
+    public function resolve($locale = null, $slug = null)
     {
+        $prependLocale = config('laradium-content.resolver.prepend_locale', false);
+
+        if (!$prependLocale && !$slug) {
+            $slug = $locale;
+        } elseif ($locale) {
+            app()->setLocale($locale);
+        }
+
         $page = null;
         if (!$slug) {
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsHomepage(true)
+            $page = Page::whereIsHomepage(true)
                 ->whereIsActive(true)
                 ->first();
 
@@ -47,18 +55,14 @@ class PageController
                     '/') !== $slug) {
                 return redirect()->to($page->slug);
             }
-
         }
 
         if (!$page) {
             $locale = app()->getLocale();
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsActive(true)
+            $page = Page::whereIsActive(true)
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
-
-
         }
 
         $parentSlugs = $this->getParentSlugs($slug);
@@ -69,8 +73,7 @@ class PageController
         }
 
         if (!$page) {
-            $page = Page::with(['blocks.block', 'content'])
-                ->whereIsActive(true)
+            $page = Page::whereIsActive(true)
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug(array_last(explode('/', $slug)))
                         ->whereLocale($locale);
@@ -80,11 +83,12 @@ class PageController
 
             $hasSameParent = $page->parent_slugs === $parentSlugs;
 
-            abort_if((!$page->parent || !$hasSameParent), 404);
+            abort_if(!$page->parent || !$hasSameParent, 404);
         }
 
-        $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts',
-            ['layouts.main' => 'Main'])));
+        $layout = $page->layout ?: array_first(array_keys(config('laradium-content.layouts', [
+            'layouts.main' => 'Main'
+        ])));
 
         return view('laradium-content::page', compact('page', 'layout'));
     }

@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Repositories;
 
+use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Content\Models\Page;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -103,6 +104,26 @@ class ContentRepository
                 }
             }
         }
+    }
+
+    /**
+     * return void
+     */
+    public function pageRoute(): void
+    {
+        $middleWares = config('laradium-content.resolver.middlewares', ['web']);
+        $customUri = config('laradium-content.resolver.custom_uri');
+        $prependLocale = config('laradium-content.resolver.prepend_locale', false);
+        $uses = config('laradium-content.resolver.uses', '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@resolve');
+
+        $uri = ($prependLocale ? '/{locale?}' : '') . '/{slug?}';
+        if (function_exists($customUri)) {
+            $uri = $customUri();
+        }
+
+        Route::get($uri, [
+            'uses' => $uses
+        ])->middleware($middleWares)->where('slug', '(.*)')->name('page.resolve');
     }
 
     /**
