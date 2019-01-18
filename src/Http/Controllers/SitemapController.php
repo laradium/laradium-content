@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Content\Http\Controllers;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Content\Models\Page;
+use SimpleXMLElement;
 
 class SitemapController
 {
@@ -15,44 +16,53 @@ class SitemapController
      */
     public function index(): Response
     {
-        $str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        $str .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset/>');
+        $xml->addAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
-        $urls = $this->fetchUrls();
+        $pages = $this->fetchPages();
 
-        foreach ($urls as $url) {
-            $str .= "<url>";
-            $str .= "<lastmod>" . $url->updated_at . "</lastmod>";
-            $str .= "<loc>" . $url->url . "</loc>";
-            $str .= "</url>";
+        foreach ($pages as $page) {
+            if (!$page->url) {
+                continue;
+            }
+
+            $item = $xml->addChild('url');
+            $item->addChild('lastmod', $page->updated_at);
+            $item->addChild('loc', $page->url);
         }
 
-        $str .= "</urlset>";
-
-        return response($str, 200, [
+        return response($xml->saveXML(), 200, [
             'Content-Type' => 'application/xml',
         ]);
     }
 
     /**
-     * Get all existing page urls.
+     * Get all existing and active pages.
      *
      * @return \Illuminate\Support\Collection
      */
-    private function fetchUrls(): Collection
+    private function fetchPages(): Collection
     {
-        $query = Page::getQuery();
-        $query->leftJoin('page_translations as pt', 'pt.page_id', '=', 'pages.id');
-        $query->selectRaw('pt.slug, ANY_VALUE(pt.updated_at) as updated_at');
-        $query->groupBy('pt.slug');
+        $prependLocale = config('laradium-content.resolver.prepend_locale', false);
 
-        $pages = $query->get();
+        $pages = Page::with('translations')->where('is_active', 1)->get();
 
-        $urls = $pages->map(function ($page) {
-            return (object)[
-                'url'        => url($page->slug),
-                'updated_at' => explode(' ', $page->updated_at)[0],
-            ];
+        $urls = collect();
+
+        $pages->each(function ($page) use ($urls, $prependLocale) {
+            $page->translations->each(function ($translation) use ($page, $urls, $prependLocale) {
+                $preSlug = '';
+                if ($page->parent && get_class($page) === Page::class) {
+                    $preSlug = $page->getParentSlugsByLocale($page->parent, $translation->locale) . '/';
+                }
+
+                if ($translation->slug) {
+                    $urls->push((object)[
+                        'url'        => url($prependLocale ? $translation->locale . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug),
+                        'updated_at' => $page->updated_at->format('Y-m-d'),
+                    ]);
+                }
+            });
         });
 
         $urls->prepend((object)[
