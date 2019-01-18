@@ -12,3 +12,5 @@ Route::group([
 
     Route::get('pages/{page}/edit', '\Laradium\Laradium\Content\Base\Resources\PageResource@edit')->name('pages.edit');
 });
+
+Route::get('sitemap.xml', 'Laradium\Laradium\Content\Http\Controllers\SitemapController@index');
