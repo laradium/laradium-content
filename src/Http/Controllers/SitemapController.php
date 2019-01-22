@@ -43,15 +43,20 @@ class SitemapController
      */
     private function fetchPages(): Collection
     {
+        $onlySiteLocale = config('laradium-content.sitemap.only_app_locale', false);
         $prependLocale = config('laradium-content.resolver.prepend_locale', false);
 
         $pages = Page::with('translations')->where('is_active', 1)->get();
 
         $urls = collect();
 
-        $pages->each(function ($page) use ($urls, $prependLocale) {
-            $page->translations->each(function ($translation) use ($page, $urls, $prependLocale) {
+        $pages->each(function ($page) use ($urls, $prependLocale, $onlySiteLocale) {
+            $page->translations->each(function ($translation) use ($page, $urls, $prependLocale, $onlySiteLocale) {
                 if ($translation->meta_noindex) {
+                    return;
+                }
+
+                if ($onlySiteLocale && $translation->locale !== app()->getLocale()) {
                     return;
                 }
 
@@ -84,7 +89,7 @@ class SitemapController
      */
     private function fetchCustomPages(): Collection
     {
-        $customSitemap = config('laradium-content.sitemap', []);
+        $customSitemap = config('laradium-content.sitemap.custom_pages', []);
         if (!$customSitemap) {
             return collect();
         }
