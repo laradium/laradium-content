@@ -59,6 +59,7 @@ class Page extends Model implements AttachableInterface
         'meta_title',
         'meta_description',
         'meta_url',
+        'meta_noindex',
 
         'page'
     ];

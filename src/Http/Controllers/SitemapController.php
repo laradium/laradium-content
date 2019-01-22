@@ -19,7 +19,7 @@ class SitemapController
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset/>');
         $xml->addAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
-        $pages = $this->fetchPages();
+        $pages = $this->fetchPages()->merge($this->fetchCustomPages());
 
         foreach ($pages as $page) {
             if (!$page->url) {
@@ -51,6 +51,10 @@ class SitemapController
 
         $pages->each(function ($page) use ($urls, $prependLocale) {
             $page->translations->each(function ($translation) use ($page, $urls, $prependLocale) {
+                if ($translation->meta_noindex) {
+                    return;
+                }
+
                 $preSlug = '';
                 if ($page->parent && get_class($page) === Page::class) {
                     $preSlug = $page->getParentSlugsByLocale($page->parent, $translation->locale) . '/';
@@ -69,6 +73,51 @@ class SitemapController
             'url'        => url('/'),
             'updated_at' => date('Y-m-d', strtotime('today')),
         ]);
+
+        return $urls;
+    }
+
+    /**
+     * Returns custom urls defined in config
+     *
+     * @return Collection
+     */
+    private function fetchCustomPages(): Collection
+    {
+        $customSitemap = config('laradium-content.sitemap', []);
+        if (!$customSitemap) {
+            return collect();
+        }
+
+        if (is_string($customSitemap) && function_exists($customSitemap)) {
+            $customSitemap = $customSitemap();
+        }
+
+        $urls = collect();
+
+        foreach ($customSitemap as $page) {
+            if (is_string($page)) {
+                $urls->push((object)[
+                    'url'        => url($page),
+                    'updated_at' => date('Y-m-d')
+                ]);
+
+                continue;
+            }
+
+            if (!isset($page['uri'])) {
+                continue;
+            }
+
+            if (!isset($page['updated_at'])) {
+                $page['updated_at'] = date('Y-m-d');
+            }
+
+            $urls->push((object)[
+                'url'        => url($page['uri']),
+                'updated_at' => $page['updated_at']
+            ]);
+        }
 
         return $urls;
     }

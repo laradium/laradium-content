@@ -29,5 +29,14 @@ return [
 
         // Defines the controller and method, the resolver route will use
         'uses'           => '\Laradium\Laradium\Content\Http\Controllers\Admin\PageController@resolve'
+    ],
+
+    'sitemap' => [
+        //[
+        //    'uri'        => '/path/to/page',
+        //    'updated_at' => '2019-01-22'
+        //],
+
+        //'/another/path/to/page'
     ]
 ];

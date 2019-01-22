@@ -24,6 +24,7 @@ class PageTranslation extends Model
         'meta_description',
         'meta_url',
         'meta_image',
+        'meta_noindex',
 
         'locale'
     ];
