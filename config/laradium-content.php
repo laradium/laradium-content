@@ -32,11 +32,11 @@ return [
     ],
 
     'sitemap' => [
-        [
-            'uri'        => '/path/to/page',
-            'updated_at' => '2019-01-22'
-        ],
+        //[
+        //    'uri'        => '/path/to/page',
+        //    'updated_at' => '2019-01-22'
+        //],
 
-        '/another/path/to/page'
+        //'/another/path/to/page'
     ]
 ];
