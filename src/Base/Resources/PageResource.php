@@ -71,7 +71,7 @@ Class PageResource extends AbstractResource
                     $set->text('meta_title')->translatable()->col(6);
                     $set->textarea('meta_description')->translatable();
                     $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
-                    $set->boolean('meta_noindex')->label('Noindex and nofollow for robots');
+                    $set->boolean('meta_noindex')->label('Noindex and nofollow for robots')->translatable();
                 });
             });
 

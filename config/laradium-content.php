@@ -32,11 +32,15 @@ return [
     ],
 
     'sitemap' => [
-        //[
-        //    'uri'        => '/path/to/page',
-        //    'updated_at' => '2019-01-22'
-        //],
+        'only_app_locale' => false,
 
-        //'/another/path/to/page'
+        'custom_pages' => [
+            //[
+            //    'uri'        => '/path/to/page',
+            //    'updated_at' => '2019-01-22'
+            //],
+
+            //'/another/path/to/page'
+        ]
     ]
 ];
