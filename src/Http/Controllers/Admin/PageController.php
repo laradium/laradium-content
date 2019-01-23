@@ -46,7 +46,7 @@ class PageController
         $page = null;
         if (!$slug) {
             $page = Page::whereIsHomepage(true)
-                ->whereIsActive(true)
+                ->active()
                 ->first();
 
             abort_if(!$page, 404);
@@ -59,7 +59,7 @@ class PageController
 
         if (!$page) {
             $locale = app()->getLocale();
-            $page = Page::whereIsActive(true)
+            $page = Page::active()
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug($slug)->whereLocale($locale);
                 })->first();
@@ -73,7 +73,7 @@ class PageController
         }
 
         if (!$page) {
-            $page = Page::whereIsActive(true)
+            $page = Page::active()
                 ->whereHas('translations', function ($q) use ($slug, $locale) {
                     $q->whereSlug(array_last(explode('/', $slug)))
                         ->whereLocale($locale);

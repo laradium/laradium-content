@@ -303,7 +303,7 @@ Class PageResource extends AbstractResource
             if ($translation->slug) {
                 $links[] = [
                     'iso_code' => $language->iso_code,
-                    'url'      => url($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug)
+                    'url'      => url($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug) . '?preview=true'
                 ];
             }
         }
