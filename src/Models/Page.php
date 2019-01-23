@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Content\Models;
 use Czim\Paperclip\Contracts\AttachableInterface;
 use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Content\Models\Translations\PageTranslation;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
@@ -79,6 +80,33 @@ class Page extends Model implements AttachableInterface
 
         parent::__construct($attributes);
     }
+
+    /**
+     * --------------------
+     * Scopes
+     * --------------------
+     */
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        $includeInActive = request()->get('preview') && auth()->check() && auth()->user()->is_admin;
+
+        if (!$includeInActive) {
+            return $query->where('is_active', true);
+        }
+
+        return $query;
+    }
+
+    /**
+     * --------------------
+     * Relationships
+     * --------------------
+     */
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo

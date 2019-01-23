@@ -15,7 +15,7 @@
                 }
             @endphp
             <b>{{ strtoupper($language->iso_code) }}: </b>
-            <a href="{{ url($prependLocale ? $language->iso_code.'/'.$preSlug.$translation->{$column} : $preSlug.$translation->{$column}) }}"
+            <a href="{{ url($prependLocale ? $language->iso_code.'/'.$preSlug.$translation->{$column} : $preSlug.$translation->{$column}) }}?preview=true"
                target="_blank">
                 {{ $preSlug.$translation->{$column} }}
             </a>
