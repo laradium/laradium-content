@@ -27,7 +27,11 @@ class LaradiumContentServiceProvider extends ServiceProvider
 
         $this->publishes([
             $assetPath  => public_path('laradium')
-        ], 'laradium-content-assets');
+        ], 'laradium');
+
+        $this->publishes([
+            $assetPath  => public_path('laradium')
+        ], 'laradium-assets');
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium-content');
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');

@@ -32,6 +32,8 @@ return [
     ],
 
     'sitemap' => [
+        'middlewares' => [],
+
         'only_app_locale' => false,
 
         'custom_pages' => [
