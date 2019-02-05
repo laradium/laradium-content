@@ -13,12 +13,6 @@ use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Page extends Model implements AttachableInterface
 {
-
-    /**
-     * @string
-     */
-    public const CACHE_KEY = 'laradium::pages';
-
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {
@@ -134,7 +128,6 @@ class Page extends Model implements AttachableInterface
 
     /**
      * @return array
-     * @throws \Exception
      */
     public function widgets(): array
     {
@@ -142,24 +135,20 @@ class Page extends Model implements AttachableInterface
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
             return [$model => $widget];
         })->toArray();
-        $blocks = $this->blocks;
+        $widgetList = [];
 
-        return cache()->rememberForever($this->getCacheKey(), function () use ($widgets, $blocks) {
-            $widgetList = [];
-
-            foreach ($blocks->load('block')->sortBy('sequence_no') as $block) {
-                $widget = $widgets[$block->block_type];
-                if ($widget) {
-                    $widget = new $widget;
-                    $widgetList[] = [
-                        'view'  => $widget->view(),
-                        'block' => $block->block
-                    ];
-                }
+        foreach ($this->blocks->load('block')->sortBy('sequence_no') as $block) {
+            $widget = $widgets[$block->block_type];
+            if ($widget) {
+                $widget = new $widget;
+                $widgetList[] = [
+                    'view'  => $widget->view(),
+                    'block' => $block->block
+                ];
             }
+        }
 
-            return $widgetList;
-        });
+        return $widgetList;
     }
 
     /**
@@ -209,14 +198,6 @@ class Page extends Model implements AttachableInterface
         }
 
         return '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getCacheKey(): string
-    {
-        return self::CACHE_KEY . '_' . $this->id;
     }
 
     /**

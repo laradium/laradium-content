@@ -31,6 +31,9 @@ Class PageResource extends AbstractResource
      */
     private $channelRegistry;
 
+    /**
+     * PageResource constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -47,10 +50,6 @@ Class PageResource extends AbstractResource
 
         $channelInstance = $this->getChannelInstance($model);
         $pages = $this->getPages();
-
-        $this->event(['afterSave', 'afterDelete'], function ($model) {
-            cache()->forget($model->getCacheKey());
-        });
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
 
@@ -195,6 +194,7 @@ Class PageResource extends AbstractResource
 
     /**
      * @param $model
+     * @return mixed
      */
     private function getChannelInstance($model)
     {
