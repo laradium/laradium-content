@@ -86,7 +86,7 @@ Class PageResource extends AbstractResource
                     if ($model->exists) {
                         $set->link('Preview', 'javascript:;')->attributes([
                             'id'         => 'preview-page',
-                            'class'      => 'btn btn-primary',
+                            'class'      => 'btn btn-primary mb-1',
                             'target'     => '_blank',
                             'data-links' => json_encode($this->getPageLinks($model))
                         ]);
