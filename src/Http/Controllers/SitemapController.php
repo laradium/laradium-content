@@ -27,8 +27,10 @@ class SitemapController
             }
 
             $item = $xml->addChild('url');
-            $item->addChild('lastmod', $page->updated_at);
             $item->addChild('loc', $page->url);
+            $item->addChild('lastmod', $page->updated_at);
+            $item->addChild('changefreq', $page->changefreq);
+            $item->addChild('priority', $page->priority);
         }
 
         return response($xml->saveXML(), 200, [
@@ -46,7 +48,7 @@ class SitemapController
         $onlySiteLocale = config('laradium-content.sitemap.only_app_locale', false);
         $prependLocale = config('laradium-content.resolver.prepend_locale', false);
 
-        $pages = Page::with('translations')->where('is_active', 1)->get();
+        $pages = Page::with('translations')->where('is_active', 1)->where('is_homepage', 0)->get();
 
         $urls = collect();
 
@@ -68,7 +70,9 @@ class SitemapController
                 if ($translation->slug) {
                     $urls->push((object)[
                         'url'        => url($prependLocale ? $translation->locale . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug),
-                        'updated_at' => $page->updated_at->format('Y-m-d'),
+                        'updated_at' => $page->updated_at ? $page->updated_at->format('Y-m-d') : date('Y-m-d'),
+                        'changefreq' => 'daily',
+                        'priority'   => 1
                     ]);
                 }
             });
@@ -77,6 +81,8 @@ class SitemapController
         $urls->prepend((object)[
             'url'        => url('/'),
             'updated_at' => date('Y-m-d', strtotime('today')),
+            'changefreq' => 'daily',
+            'priority'   => 1
         ]);
 
         return $urls;
@@ -104,7 +110,9 @@ class SitemapController
             if (is_string($page)) {
                 $urls->push((object)[
                     'url'        => url($page),
-                    'updated_at' => date('Y-m-d')
+                    'updated_at' => date('Y-m-d'),
+                    'changefreq' => 'daily',
+                    'priority'   => 1
                 ]);
 
                 continue;
@@ -118,9 +126,19 @@ class SitemapController
                 $page['updated_at'] = date('Y-m-d');
             }
 
+            if (!isset($page['changefreq'])) {
+                $page['changefreq'] = 'daily';
+            }
+
+            if (!isset($page['priority'])) {
+                $page['priority'] = 1;
+            }
+
             $urls->push((object)[
                 'url'        => url($page['uri']),
-                'updated_at' => $page['updated_at']
+                'updated_at' => $page['updated_at'],
+                'changefreq' => $page['changefreq'],
+                'priority'   => $page['priority'],
             ]);
         }
 
