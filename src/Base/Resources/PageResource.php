@@ -7,12 +7,10 @@ use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\Page;
-use \Laradium\Laradium\Content\Registries\ChannelRegistry;
-use Laradium\Laradium\Models\Language;
+use Laradium\Laradium\Content\Registries\ChannelRegistry;
 
-Class PageResource extends AbstractResource
+class PageResource extends AbstractResource
 {
-
     /**
      * @var string
      */
@@ -98,24 +96,6 @@ Class PageResource extends AbstractResource
         })->js([
             asset('laradium/assets/js/page.js')
         ]);
-    }
-
-    /**
-     * @param $model
-     * @return string
-     */
-    private function getSlugLabel($model): string
-    {
-        $slug = 'Slug';
-        if (!$model->exists) {
-            return $slug;
-        }
-
-        if ($model->parent) {
-            return $slug . ' (<small><b>pre slug</b> ' . $model->parent_slugs . '</small>)';
-        }
-
-        return $slug;
     }
 
     /**
@@ -262,13 +242,13 @@ Class PageResource extends AbstractResource
         if ($score >= 95) {
             $labelClass = 'badge-success';
             $labelText = 'Very good';
-        } elseif ($score >= 70) {
+        } else if ($score >= 70) {
             $labelClass = 'badge-info';
             $labelText = 'Good';
-        } elseif ($score >= 50) {
+        } else if ($score >= 50) {
             $labelClass = 'badge-warning';
             $labelText = 'Average';
-        } elseif ($score >= 40) {
+        } else if ($score >= 40) {
             $labelClass = 'badge-danger';
             $labelText = 'Bad';
         } else {
@@ -309,5 +289,23 @@ Class PageResource extends AbstractResource
         }
 
         return $links;
+    }
+
+    /**
+     * @param $model
+     * @return string
+     */
+    private function getSlugLabel($model): string
+    {
+        $slug = 'Slug';
+        if (!$model->exists) {
+            return $slug;
+        }
+
+        if ($model->parent) {
+            return $slug . ' (<small><b>pre slug</b> ' . $model->parent_slugs . '</small>)';
+        }
+
+        return $slug;
     }
 }

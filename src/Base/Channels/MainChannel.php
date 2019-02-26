@@ -4,7 +4,7 @@ namespace Laradium\Laradium\Content\Base\Channels;
 
 use Laradium\Laradium\Base\FieldSet;
 
-Class MainChannel
+class MainChannel
 {
 
     /**
