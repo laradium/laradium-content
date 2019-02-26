@@ -43,9 +43,7 @@ class PageApiResource extends AbstractApiResource
         } catch (\Exception $e) {
             logger()->error($e);
 
-            return response()->json([
-                'success' => false,
-            ], 500);
+            abort(500);
         }
     }
 
@@ -114,9 +112,7 @@ class PageApiResource extends AbstractApiResource
                 logger()->error($e);
             }
 
-            return response()->json([
-                'success' => false,
-            ], $e instanceof NotFoundHttpException ? 404 : 500);
+            abort($e instanceof NotFoundHttpException ? 404 : 500);
         }
     }
 
