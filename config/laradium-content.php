@@ -46,8 +46,8 @@ return [
     ],
 
     'api' => [
-        'enabled'        => true,
-        'prepend_locale' => true,
+        'enabled'        => false,
+        'prepend_locale' => false,
         'middleware'     => ['api']
     ]
 ];
