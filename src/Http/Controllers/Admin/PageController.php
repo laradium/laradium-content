@@ -39,7 +39,7 @@ class PageController
 
         if (!$prependLocale && !$slug) {
             $slug = $locale;
-        } elseif ($locale) {
+        } else if ($locale) {
             app()->setLocale($locale);
         }
 
