@@ -64,7 +64,8 @@ class PageApiResource extends AbstractApiResource
             }
 
             $page = null;
-            if (!$slug) {
+
+            if ($slug === 'homepage') {
                 $page = $this->getModel()::whereIsHomepage(true)
                     ->active()
                     ->first();
