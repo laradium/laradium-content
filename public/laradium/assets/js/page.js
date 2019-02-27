@@ -32,11 +32,17 @@ $(document).ready(function () {
     });
 
     $(document).on('scroll', function () {
-        var elem = jQuery('#page-sidebar');
+        var elem = $('#page-sidebar');
         var y = $(document).scrollTop();
+        var alert = $('.alert');
 
-        if (y >= 35) {
-            elem.css('margin-top', y - 35);
+        var gap = 35;
+        if (alert.length && alert.is(':visible')) {
+            gap = 95;
+        }
+
+        if (y >= gap) {
+            elem.css('margin-top', y - gap);
         } else {
             elem.css('margin-top', 0)
         }
