@@ -37,7 +37,7 @@ $(document).ready(function () {
         var alert = $('.alert');
 
         var gap = 35;
-        if (alert.length && alert.is(":visible")) {
+        if (alert.length && alert.is(':visible')) {
             gap = 95;
         }
 
