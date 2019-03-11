@@ -221,7 +221,9 @@ class PageApiResource extends AbstractApiResource
             return false;
         }
 
-        $widgetName = strtolower(str_replace('Widget', '', array_last(explode('\\', get_class($widget)))));
+        $widgetName = str_replace('Widget', '', array_last(explode('\\', get_class($widget))));
+        $widgetName = strtolower(preg_replace('/\B([A-Z])/', '-$1', $widgetName));
+
         return [
             'name' => $widgetName,
             'data' => $widget->response($data, $locale)
