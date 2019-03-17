@@ -13,6 +13,7 @@ use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Page extends Model implements AttachableInterface
 {
+
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {
@@ -138,14 +139,16 @@ class Page extends Model implements AttachableInterface
         $widgetList = [];
 
         foreach ($this->blocks->load('block')->sortBy('sequence_no') as $block) {
-            $widget = $widgets[$block->block_type];
-            if ($widget) {
-                $widget = new $widget;
-                $widgetList[] = [
-                    'view'  => $widget->view(),
-                    'block' => $block->block
-                ];
+            $widget = $widgets[$block->block_type] ?? null;
+            if (!$widget) {
+                continue;
             }
+
+            $widget = new $widget;
+            $widgetList[] = [
+                'view'  => $widget->view(),
+                'block' => $block->block
+            ];
         }
 
         return $widgetList;
