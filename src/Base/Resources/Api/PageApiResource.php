@@ -190,18 +190,19 @@ class PageApiResource extends AbstractApiResource
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
             return [$model => $widget];
         })->toArray();
-        $widgetList = [];
+        $widgetList = collect([]);
 
         foreach ($page->blocks->load('block')->sortBy('sequence_no') as $block) {
             if ($widget = $this->getWidget($widgets[$block->block_type], $block->block, $locale)) {
-                $widgetList[] = [
-                    'name' => $widget['name'],
-                    'data' => $widget['data']
-                ];
+                if ($count = $widgetList->where('name', $widget['name'])->count()) {
+                    $widget['id'] = $count;
+                }
+
+                $widgetList->push($widget);
             }
         }
 
-        return $widgetList;
+        return $widgetList->toArray();
     }
 
     /**
