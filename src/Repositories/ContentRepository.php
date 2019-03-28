@@ -15,7 +15,7 @@ class ContentRepository
      */
     public function getPage($key)
     {
-        $pages = cache()->rememberForever('laradium::content-pages', function () {
+        $pages = cache()->rememberForever('laradium::content-pages-' . app()->getLocale(), function () {
             return Page::get();
         });
 
@@ -23,13 +23,15 @@ class ContentRepository
         if (!$page) {
             return (object)[
                 'title' => '',
-                'url'   => url('/')
+                'url'   => url('/'),
+                'slug'  => ''
             ];
         }
 
         return (object)[
             'title' => $page->title,
-            'url'   => url($page->slug)
+            'url'   => url($page->slug),
+            'slug'  => $page->slug
         ];
     }
 

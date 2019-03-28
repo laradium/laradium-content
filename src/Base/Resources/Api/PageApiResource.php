@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Base\Resources\Api;
 
+use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\AbstractApiResource;
 use Laradium\Laradium\Content\Models\Page;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
@@ -141,7 +142,7 @@ class PageApiResource extends AbstractApiResource
      * @param null $locale
      * @return array
      */
-    private function responseWithContent(Page $page, $locale = null): array
+    protected function responseWithContent(Page $page, $locale = null): array
     {
         $translation = $page->translateOrNew($locale);
 
@@ -162,7 +163,7 @@ class PageApiResource extends AbstractApiResource
      * @param $locale
      * @return mixed
      */
-    private function channel(Page $page, $locale)
+    protected function channel(Page $page, $locale)
     {
         if (!$page->content_type) {
             return null;
@@ -182,9 +183,9 @@ class PageApiResource extends AbstractApiResource
     /**
      * @param Page $page
      * @param $locale
-     * @return array
+     * @return Collection
      */
-    private function widgets(Page $page, $locale): array
+    protected function widgets(Page $page, $locale): Collection
     {
         $widgetRegistry = app(WidgetRegistry::class);
         $widgets = $widgetRegistry->all()->mapWithKeys(function ($model, $widget) {
@@ -202,7 +203,7 @@ class PageApiResource extends AbstractApiResource
             }
         }
 
-        return $widgetList->toArray();
+        return $widgetList;
     }
 
     /**
@@ -211,7 +212,7 @@ class PageApiResource extends AbstractApiResource
      * @param $locale
      * @return array|bool
      */
-    private function getWidget($widget, $data, $locale)
+    protected function getWidget($widget, $data, $locale)
     {
         if (!$widget) {
             return false;
@@ -235,7 +236,7 @@ class PageApiResource extends AbstractApiResource
      * @param string $slug
      * @return string
      */
-    private function getParentSlugs($slug): ?string
+    protected function getParentSlugs($slug): ?string
     {
         $slugParts = explode('/', $slug);
         if (count($slugParts) <= 1) {
@@ -250,12 +251,12 @@ class PageApiResource extends AbstractApiResource
     /**
      * Set api routes
      */
-    private function setApi(): void
+    protected function setApi(): void
     {
         $apiEnabled = config('laradium-content.api.enabled', false);
         if ($apiEnabled) {
             $prependLocale = config('laradium-content.api.prepend_locale', false);
-            $uri = $prependLocale ? '{locale?}/' : '';
+            $uri = $prependLocale ? '{locale}/' : '';
 
             $this->customRoutes = [
                 'index' => [
