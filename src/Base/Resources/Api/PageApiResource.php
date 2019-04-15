@@ -133,6 +133,7 @@ class PageApiResource extends AbstractApiResource
                 'title'       => $translation->title,
                 'slug'        => $translation->slug,
                 'is_homepage' => $page->is_homepage,
+                'css_class'   => $page->css_class
             ],
         ];
     }

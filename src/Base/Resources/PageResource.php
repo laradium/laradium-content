@@ -70,6 +70,10 @@ class PageResource extends AbstractResource
                     $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
                     $set->boolean('meta_noindex')->label('Noindex and nofollow for robots')->translatable();
                 });
+
+                $set->tab('Options')->fields(function (FieldSet $set) {
+                    $set->text('css_class')->info('You can add multiple css classes separating them by space');
+                });
             });
 
             $set->block(3)->fields(function (FieldSet $set) use ($pages, $model) {

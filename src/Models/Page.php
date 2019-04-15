@@ -35,7 +35,8 @@ class Page extends Model implements AttachableInterface
         'is_homepage',
         'meta_image',
         'layout',
-        'key'
+        'key',
+        'css_class'
     ];
 
     /**
