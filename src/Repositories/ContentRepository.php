@@ -8,14 +8,17 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ContentRepository
 {
+
     /**
      * @param $key
+     * @param null $locale
      * @return object
      * @throws \Exception
      */
-    public function getPage($key)
+    public function getPage($key, $locale = null)
     {
-        $pages = cache()->rememberForever('laradium::content-pages-' . app()->getLocale(), function () {
+        $locale = $locale ?? app()->getLocale();
+        $pages = cache()->rememberForever('laradium::content-pages-' . $locale, function () {
             return Page::get();
         });
 
@@ -29,9 +32,9 @@ class ContentRepository
         }
 
         return (object)[
-            'title' => $page->title,
-            'url'   => url($page->slug),
-            'slug'  => $page->slug
+            'title' => $page->translateOrNew($locale)->title,
+            'url'   => url($page->translateOrNew($locale)->slug),
+            'slug'  => $page->translateOrNew($locale)->slug
         ];
     }
 
