@@ -139,7 +139,7 @@ class Page extends Model implements AttachableInterface
         })->toArray();
         $widgetList = [];
 
-        foreach ($this->blocks->load('block')->sortBy('sequence_no') as $block) {
+        foreach ($this->blocks->where('is_active', true)->load('block')->sortBy('sequence_no') as $block) {
             $widget = $widgets[$block->block_type] ?? null;
             if (!$widget) {
                 continue;
@@ -148,7 +148,7 @@ class Page extends Model implements AttachableInterface
             $widget = new $widget;
             $widgetList[] = [
                 'view'  => $widget->view(),
-                'block' => $block->block
+                'block' => $block
             ];
         }
 

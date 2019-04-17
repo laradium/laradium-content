@@ -4,8 +4,11 @@ namespace Laradium\Laradium\Content\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
+use Laradium\Laradium\Base\Fields\Boolean;
+use Laradium\Laradium\Base\Fields\HasMany;
 use Laradium\Laradium\Base\Fields\Hidden;
 use Laradium\Laradium\Base\Fields\MorphTo;
+use Laradium\Laradium\Base\Fields\Text;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\ContentBlock;
 use Laradium\Laradium\Content\Registries\WidgetRegistry;
@@ -85,7 +88,7 @@ class WidgetConstructor extends Field
     public function formattedResponse()
     {
         $data = parent::formattedResponse();
-        $data['value'] = \Laradium\Laradium\Base\Fields\HasMany::class;
+        $data['value'] = HasMany::class;
 
         $data['blocks'] = $this->getEntries();
         $data['template_data'] = $this->templateData;
@@ -130,6 +133,31 @@ class WidgetConstructor extends Field
             if ($morphTo->getValidationRules()) {
                 $validationRules = array_merge($validationRules, $morphTo->getValidationRules());
             }
+
+            $fields[] = (new Boolean(['is_active'], $item))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->col(3)
+                ->value(1)
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->formattedResponse();
+
+            $fields[] = (new Boolean(['class'], $item))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->formattedResponse();
+
+            $fields[] = (new Boolean(['margin_top'], $item))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->formattedResponse();
+
+            $fields[] = (new Boolean(['margin_bottom'], $item))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->formattedResponse();
 
             $fields[] = $morphTo->formattedResponse();
 
@@ -182,6 +210,26 @@ class WidgetConstructor extends Field
                     $widget->fields($set);
                 })
                 ->build()
+                ->formattedResponse();
+
+            $fields[] = (new Boolean(['is_active'], $item))
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+
+            $fields[] = (new Text(['class'], $item))
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+
+            $fields[] = (new Text(['margin_top'], $item))
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+
+            $fields[] = (new Text(['margin_bottom'], $item))
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
             $entries[] = [
