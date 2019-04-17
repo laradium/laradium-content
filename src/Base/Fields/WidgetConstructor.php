@@ -141,19 +141,19 @@ class WidgetConstructor extends Field
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
-            $fields[] = (new Boolean(['class'], $item))
+            $fields[] = (new Text(['class'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
-            $fields[] = (new Boolean(['margin_top'], $item))
+            $fields[] = (new Text(['margin_top'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
-            $fields[] = (new Boolean(['margin_bottom'], $item))
+            $fields[] = (new Text(['margin_bottom'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
