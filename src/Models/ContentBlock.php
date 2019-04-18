@@ -16,8 +16,7 @@ class ContentBlock extends Model
         'block_id',
         'is_active',
         'class',
-        'margin_top',
-        'margin_bottom'
+        'style',
     ];
 
     /**

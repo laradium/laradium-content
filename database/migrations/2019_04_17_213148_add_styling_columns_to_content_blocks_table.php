@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddStylingColumnsToContentBlocksTable extends Migration
 {
@@ -16,8 +16,7 @@ class AddStylingColumnsToContentBlocksTable extends Migration
         Schema::table('content_blocks', function (Blueprint $table) {
             $table->boolean('is_active')->default(1)->nullable()->after('sequence_no');
             $table->string('class')->nullable()->after('is_active');
-            $table->string('margin_top')->nullable()->after('class');
-            $table->string('margin_bottom')->nullable()->after('margin_top');
+            $table->text('style')->nullable()->after('class');
         });
     }
 
@@ -32,8 +31,7 @@ class AddStylingColumnsToContentBlocksTable extends Migration
             $table->dropColumn([
                 'is_active',
                 'class',
-                'margin_top',
-                'margin_bottom',
+                'style',
             ]);
         });
     }

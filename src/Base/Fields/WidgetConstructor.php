@@ -136,26 +136,20 @@ class WidgetConstructor extends Field
 
             $fields[] = (new Boolean(['is_active'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(3)
+                ->col(4)
                 ->value(1)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
             $fields[] = (new Text(['class'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(3)
+                ->col(4)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
-            $fields[] = (new Text(['margin_top'], $item))
+            $fields[] = (new Text(['style'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(3)
-                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
-                ->formattedResponse();
-
-            $fields[] = (new Text(['margin_bottom'], $item))
-                ->replacementAttributes($this->getReplacementAttributes())
-                ->col(3)
+                ->col(4)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
@@ -213,22 +207,17 @@ class WidgetConstructor extends Field
                 ->formattedResponse();
 
             $fields[] = (new Boolean(['is_active'], $item))
-                ->col(3)
+                ->col(4)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
             $fields[] = (new Text(['class'], $item))
-                ->col(3)
+                ->col(4)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
-            $fields[] = (new Text(['margin_top'], $item))
-                ->col(3)
-                ->build(array_merge($this->getAttributes(), [$item->id]))
-                ->formattedResponse();
-
-            $fields[] = (new Text(['margin_bottom'], $item))
-                ->col(3)
+            $fields[] = (new Text(['style'], $item))
+                ->col(4)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
