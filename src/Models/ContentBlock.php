@@ -12,6 +12,7 @@ class ContentBlock extends Model
      */
     protected $fillable = [
         'sequence_no',
+        'title',
         'block_type',
         'block_id',
         'is_active',

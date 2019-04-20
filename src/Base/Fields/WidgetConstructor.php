@@ -134,22 +134,28 @@ class WidgetConstructor extends Field
                 $validationRules = array_merge($validationRules, $morphTo->getValidationRules());
             }
 
+            $fields[] = (new Text(['title'], $item))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->col(3)
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->formattedResponse();
+
             $fields[] = (new Boolean(['is_active'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(4)
+                ->col(3)
                 ->value(1)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
             $fields[] = (new Text(['class'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(4)
+                ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
             $fields[] = (new Text(['style'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
-                ->col(4)
+                ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
@@ -206,18 +212,24 @@ class WidgetConstructor extends Field
                 ->build()
                 ->formattedResponse();
 
+            $fields[] = (new Text(['title'], $item))
+                ->col(3)
+                ->label('Widget title')
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+
             $fields[] = (new Boolean(['is_active'], $item))
-                ->col(4)
+                ->col(3)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
             $fields[] = (new Text(['class'], $item))
-                ->col(4)
+                ->col(3)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
             $fields[] = (new Text(['style'], $item))
-                ->col(4)
+                ->col(3)
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
 
