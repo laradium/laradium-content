@@ -137,6 +137,7 @@ class WidgetConstructor extends Field
             $fields[] = (new Text(['title'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->col(3)
+                ->label('Widget title')
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
 
