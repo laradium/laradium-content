@@ -134,6 +134,8 @@ class WidgetConstructor extends Field
                 $validationRules = array_merge($validationRules, $morphTo->getValidationRules());
             }
 
+            $fields[] = $morphTo->formattedResponse();
+
             $fields[] = (new Text(['title'], $item))
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->col(3)
@@ -159,8 +161,6 @@ class WidgetConstructor extends Field
                 ->col(3)
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->formattedResponse();
-
-            $fields[] = $morphTo->formattedResponse();
 
             $blocks[] = [
                 'label'           => $this->normalizeLabel(class_basename($widget)),

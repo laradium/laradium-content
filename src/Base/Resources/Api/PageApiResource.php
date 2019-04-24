@@ -195,7 +195,7 @@ class PageApiResource extends AbstractApiResource
         $widgetList = collect([]);
 
         foreach ($page->blocks->load('block')->sortBy('sequence_no') as $block) {
-            if ($widget = $this->getWidget($widgets[$block->block_type], $block->block, $locale)) {
+            if ($widget = $this->getWidget($widgets[$block->block_type], $block, $locale)) {
                 if ($count = $widgetList->where('name', $widget['name'])->count()) {
                     $widget['id'] = $count;
                 }
@@ -209,11 +209,11 @@ class PageApiResource extends AbstractApiResource
 
     /**
      * @param $widget
-     * @param $data
+     * @param $block
      * @param $locale
      * @return array|bool
      */
-    protected function getWidget($widget, $data, $locale)
+    protected function getWidget($widget, $block, $locale)
     {
         if (!$widget) {
             return false;
@@ -227,9 +227,16 @@ class PageApiResource extends AbstractApiResource
         $widgetName = array_last(explode('\\', get_class($widget)));
         $widgetName = strtolower(preg_replace('/\B([A-Z])/', '-$1', $widgetName));
 
+        $data = $block->block;
+        $widgetData = $widget->response($data, $locale);
+        $widgetData['config'] = [
+            'class' => $block->class,
+            'style' => $block->style,
+        ];
+
         return [
             'name' => $widgetName,
-            'data' => $widget->response($data, $locale)
+            'data' => $widgetData
         ];
     }
 
