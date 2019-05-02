@@ -14,5 +14,5 @@ Route::group([
 });
 
 Route::middleware(config('laradium-content.sitemap.middlewares', []))->group(function () {
-    Route::get('sitemap.xml', 'Laradium\Laradium\Content\Http\Controllers\SitemapController@index');
+    Route::get('sitemap.xml', config('laradium-content.sitemap.uses', '\Laradium\Laradium\Content\Http\Controllers\SitemapController@index'));
 });
