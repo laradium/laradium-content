@@ -80,7 +80,7 @@ class PageResource extends AbstractResource
                 $set->languageSelect();
 
                 $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
-                $set->select('parent_id')->options($pages)->label('Parent');
+                $set->select2('parent_id')->options($pages)->label('Parent');
                 $set->boolean('is_active')->col(6);
                 $set->boolean('is_homepage')->col(6);
 
