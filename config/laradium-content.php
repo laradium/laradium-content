@@ -42,7 +42,9 @@ return [
             //],
 
             //'/another/path/to/page'
-        ]
+        ],
+
+        'uses' => '\Laradium\Laradium\Content\Http\Controllers\SitemapController@index'
     ],
 
     'api' => [

@@ -49,6 +49,12 @@ class PageResource extends AbstractResource
         $channelInstance = $this->getChannelInstance($model);
         $pages = $this->getPages();
 
+        $this->event('afterDelete', function ($page) {
+            if ($content = $page->content) {
+                $content->delete();
+            }
+        });
+
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
 
             $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
