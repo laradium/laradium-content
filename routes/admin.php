@@ -4,7 +4,7 @@ Route::group([
     'prefix'     => 'admin',
     'as'         => 'admin.',
     'namespace'  => 'Admin',
-    'middleware' => ['web'],
+    'middleware' => ['web', 'laradium'],
 ], function () {
     Route::put('pages/{page}/duplicate', '\Laradium\Laradium\Content\Base\Resources\PageResource@duplicate')->name('pages.duplicate');
 
@@ -15,7 +15,6 @@ Route::group([
     Route::get('pages/{page}/edit', '\Laradium\Laradium\Content\Base\Resources\PageResource@edit')->name('pages.edit');
 
 });
-//Route::post'pages-duplicate', '\Laradium\Laradium\Content\Base\Resources\PageResource@duplicate')->name('pages.duplicate');
 
 Route::middleware(config('laradium-content.sitemap.middlewares', []))->group(function () {
     Route::get('sitemap.xml', config('laradium-content.sitemap.uses', '\Laradium\Laradium\Content\Http\Controllers\SitemapController@index'));

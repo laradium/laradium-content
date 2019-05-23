@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
@@ -9,6 +10,7 @@ use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Content\Models\Page;
 use Laradium\Laradium\Content\Registries\ChannelRegistry;
+use ReflectionException;
 
 class PageResource extends AbstractResource
 {
@@ -101,7 +103,8 @@ class PageResource extends AbstractResource
                             'data-links' => json_encode($this->getPageLinks($model))
                         ]);
 
-                        $set->customContent('<button class="btn btn-primary mb-1 ml-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate', $model) . '">Duplicate</button>')->attributes([
+                        $set->customContent('<button class="btn btn-primary mb-1 ml-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
+                                $model) . '">Duplicate</button>')->attributes([
                             'style' => 'display: inline-block;'
                         ]);
                     }
@@ -157,18 +160,18 @@ class PageResource extends AbstractResource
     /**
      * @param Request $request
      * @param Page $page
-     * @return array
-     * @throws \ReflectionException
+     * @return JsonResponse
+     * @throws ReflectionException
      */
-    public function duplicate(Request $request, Page $page)
+    public function duplicate(Request $request, Page $page): JsonResponse
     {
         $data = $request->all();
-        foreach ($data['translations'] as $locale => $translations){
-            if($translations['title']) {
+        foreach ($data['translations'] as $locale => $translations) {
+            if ($translations['title']) {
                 $data['translations'][$locale]['title'] = $translations['title'] . ' copy';
             }
 
-            if($translations['slug']) {
+            if ($translations['slug']) {
                 $data['translations'][$locale]['slug'] = $translations['slug'] . '-copy';
             }
 
@@ -181,19 +184,19 @@ class PageResource extends AbstractResource
 
         $model = $this->saveData($data, $this->getModel());
 
-        return [
+        return response()->json([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'redirect_to' => route('admin.pages.edit', $model)
             ]
-        ];
+        ]);
     }
 
     /**
      * @param $array
      * @return bool
      */
-    private function recursiveUnsetIds(&$array)
+    private function recursiveUnsetIds(&$array): bool
     {
         foreach ($array as $index => &$value) {
             if (in_array($index, ['id']) && !is_numeric($index)) {
@@ -282,7 +285,7 @@ class PageResource extends AbstractResource
     /**
      * Get overall SEO status based on filled/empty SEO values.
      *
-     * @param \Laradium\Laradium\Content\Models\Page $item
+     * @param Page $item
      * @return string
      */
     private function checkSeoStatus(Page $item): string
