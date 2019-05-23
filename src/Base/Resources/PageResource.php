@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
@@ -11,6 +12,7 @@ use Laradium\Laradium\Content\Registries\ChannelRegistry;
 
 class PageResource extends AbstractResource
 {
+
     /**
      * @var string
      */
@@ -98,6 +100,10 @@ class PageResource extends AbstractResource
                             'target'     => '_blank',
                             'data-links' => json_encode($this->getPageLinks($model))
                         ]);
+
+                        $set->customContent('<button class="btn btn-primary mb-1 ml-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate', $model) . '">Duplicate</button>')->attributes([
+                            'style' => 'display: inline-block;'
+                        ]);
                     }
                 })->withoutLanguageSelect();
             })->attributes([
@@ -146,6 +152,64 @@ class PageResource extends AbstractResource
             ->additionalView('laradium-content::admin.pages.index-top', [
                 'channels' => $this->channelRegistry->all()
             ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param Page $page
+     * @return array
+     * @throws \ReflectionException
+     */
+    public function duplicate(Request $request, Page $page)
+    {
+        $data = $request->all();
+        foreach ($data['translations'] as $locale => $translations){
+            if($translations['title']) {
+                $data['translations'][$locale]['title'] = $translations['title'] . ' copy';
+            }
+
+            if($translations['slug']) {
+                $data['translations'][$locale]['slug'] = $translations['slug'] . '-copy';
+            }
+
+            $data['is_active'] = false;
+        }
+
+
+        $this->recursiveUnsetIds($data);
+        $this->model(new Page());
+
+        $model = $this->saveData($data, $this->getModel());
+
+        return [
+            'success' => true,
+            'data' => [
+                'redirect_to' => route('admin.pages.edit', $model)
+            ]
+        ];
+    }
+
+    /**
+     * @param $array
+     * @return bool
+     */
+    private function recursiveUnsetIds(&$array)
+    {
+        foreach ($array as $index => &$value) {
+            if (in_array($index, ['id']) && !is_numeric($index)) {
+                unset($array[$index]);
+            }
+
+            if (is_array($value)) {
+                if (array_get($value, 'remove', null)) {
+                    unset($array[$index]);
+                }
+
+                $this->recursiveUnsetIds($value, ['id']);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -252,18 +316,24 @@ class PageResource extends AbstractResource
         if ($score >= 95) {
             $labelClass = 'badge-success';
             $labelText = 'Very good';
-        } else if ($score >= 70) {
-            $labelClass = 'badge-info';
-            $labelText = 'Good';
-        } else if ($score >= 50) {
-            $labelClass = 'badge-warning';
-            $labelText = 'Average';
-        } else if ($score >= 40) {
-            $labelClass = 'badge-danger';
-            $labelText = 'Bad';
         } else {
-            $labelClass = 'badge-danger';
-            $labelText = 'Very bad';
+            if ($score >= 70) {
+                $labelClass = 'badge-info';
+                $labelText = 'Good';
+            } else {
+                if ($score >= 50) {
+                    $labelClass = 'badge-warning';
+                    $labelText = 'Average';
+                } else {
+                    if ($score >= 40) {
+                        $labelClass = 'badge-danger';
+                        $labelText = 'Bad';
+                    } else {
+                        $labelClass = 'badge-danger';
+                        $labelText = 'Very bad';
+                    }
+                }
+            }
         }
 
         return '<label class="badge ' . $labelClass . '">' . $labelText . ' (' . (int)$score . '%)</label>';
