@@ -48,7 +48,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '#duplicate-page', (e) => {
+    $(document).on('click', '#duplicate-page', async function (e) {
         e.preventDefault();
         $(e.target).prop('disabled', true);
         let form = $(document).find('.crud-form');
@@ -67,38 +67,48 @@ $(document).ready(function () {
             }
         });
 
-        $(form).find('input[name][type="file"]').each(async function (i, e) {
-            let fileUrl = $(e).closest('div').find('a').attr('href');
-            if (fileUrl) {
-                let response = await fetch(fileUrl);
-                let data = await response.blob();
-                let metadata = {
-                    type: 'image/jpeg'
-                };
-                let filename = fileUrl.split('/').pop();
-                let file = new File([data], filename, metadata);
-                setTimeout(function () {
-                    formData.append($(e).attr('name'), file);
-                }, 800);
-            }
-        });
+        let fileInputs = $(form).find('input[name][type="file"]');
 
+        for (let index in fileInputs) {
+            if (!fileInputs.hasOwnProperty(index)) {
+                continue;
+            }
+
+            let file = fileInputs[index];
+            let link = $(file).closest('div').find('a');
+            if (!link.length) {
+                continue;
+            }
+            let fileUrl = link.attr('href');
+
+            if (!fileUrl) {
+                continue;
+            }
+
+            let response = await fetch(fileUrl);
+            let data = await response.blob();
+
+            let filename = fileUrl.split('/').pop();
+            let fileObj = new File([data], filename, {
+                type: data.type
+            });
+
+            formData.append($(file).attr('name'), fileObj);
+        }
 
         let url = $(e.target).data('url');
+        let res = await axios({
+            method: 'POST',
+            url: url,
+            data: formData,
+        });
+        let {data} = await res.data;
 
-        setTimeout(async function () {
-            let res = await axios({
-                method: 'POST',
-                url: url,
-                data: formData,
-            });
-            let {data} = await res.data;
-            $(e.target).prop('disabled', false);
+        $(e.target).prop('disabled', false);
 
-            if (data) {
-                window.location = data.redirect_to;
-            }
-        }, 1000);
+        if (data) {
+            window.location = data.redirect_to;
+        }
     });
 });
 
