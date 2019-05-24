@@ -98,12 +98,12 @@ class PageResource extends AbstractResource
                     if ($model->exists) {
                         $set->link('Preview', 'javascript:;')->attr([
                             'id'         => 'preview-page',
-                            'class'      => 'btn btn-primary mb-1',
+                            'class'      => 'btn btn-primary mb-1 ml-1',
                             'target'     => '_blank',
                             'data-links' => json_encode($this->getPageLinks($model))
                         ]);
 
-                        $set->customContent('<button class="btn btn-primary mb-1 ml-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
+                        $set->customContent('<button class="btn btn-primary mb-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
                                 $model) . '">Duplicate</button>')->attributes([
                             'style' => 'display: inline-block;'
                         ]);
