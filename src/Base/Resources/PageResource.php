@@ -113,7 +113,7 @@ class PageResource extends AbstractResource
                 'id' => 'page-sidebar'
             ]);
         })->js([
-            asset('laradium/assets/js/page.js')
+            versionedAsset('laradium/assets/js/page.js')
         ]);
     }
 
