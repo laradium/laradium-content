@@ -366,7 +366,7 @@ class PageResource extends AbstractResource
             if ($translation->slug) {
                 $links[] = [
                     'iso_code' => $language->iso_code,
-                    'url'      => url($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug) . '?preview=true'
+                    'url'      => config('laradium-content.page_preview_url', url('/')) . '/' . ($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug) . '?preview=true'
                 ];
             }
         }

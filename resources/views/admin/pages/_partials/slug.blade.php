@@ -13,9 +13,10 @@
                 if(get_class($item) === \Laradium\Laradium\Content\Models\Page::class && $item->parent) {
                     $preSlug = $item->getParentSlugsByLocale($item->parent, $language->iso_code) . '/';
                 }
+                $uri = $prependLocale ? $language->iso_code.'/'.$preSlug.$translation->{$column} : $preSlug.$translation->{$column};
             @endphp
             <b>{{ strtoupper($language->iso_code) }}: </b>
-            <a href="{{ url($prependLocale ? $language->iso_code.'/'.$preSlug.$translation->{$column} : $preSlug.$translation->{$column}) }}?preview=true"
+            <a href="{{ config('laradium-content.page_preview_url', url('/')) . '/' . $uri }}?preview=true"
                target="_blank">
                 {{ $preSlug.$translation->{$column} }}
             </a>
