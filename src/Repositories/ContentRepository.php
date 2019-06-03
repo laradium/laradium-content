@@ -26,14 +26,14 @@ class ContentRepository
         if (!$page) {
             return (object)[
                 'title' => '',
-                'url'   => url('/'),
+                'url'   => config('laradium-content.page_preview_url', url('/')),
                 'slug'  => ''
             ];
         }
 
         return (object)[
             'title' => $page->translateOrNew($locale)->title,
-            'url'   => url($page->translateOrNew($locale)->slug),
+            'url'   => config('laradium-content.page_preview_url', url('/')) . '/' . $page->translateOrNew($locale)->slug,
             'slug'  => $page->translateOrNew($locale)->slug
         ];
     }
