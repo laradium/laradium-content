@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Content\Models\Page;
 use Laradium\Laradium\Content\Registries\ChannelRegistry;
 use ReflectionException;
@@ -34,6 +36,11 @@ class PageResource extends AbstractResource
     private $channelRegistry;
 
     /**
+     * @var bool
+     */
+    protected $withoutCard = true;
+
+    /**
      * PageResource constructor.
      */
     public function __construct()
@@ -44,7 +51,7 @@ class PageResource extends AbstractResource
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Resource
+     * @return Resource
      */
     public function resource()
     {
@@ -60,65 +67,73 @@ class PageResource extends AbstractResource
         });
 
         return laradium()->resource(function (FieldSet $set) use ($channelInstance, $pages, $model) {
+            $set->col(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                $set->tabs()
+                    ->add('Main data', function (FieldSet $set) use ($channelInstance, $model) {
+                        $set->block(12)->fields(function (FieldSet $set) use ($channelInstance, $model) {
+                            $set->text('title')->rules('required|max:255')->translatable()->col(6);
+                            $set->text('slug')
+                                ->rules('max:255')
+                                ->translatable()
+                                ->col(6)
+                                ->label($this->getSlugLabel($model));
 
-            $set->block(9)->fields(function (FieldSet $set) use ($channelInstance, $model) {
-                $set->tab('Main')->fields(function (FieldSet $set) use ($channelInstance, $model) {
-                    $set->text('title')->rules('required|max:255')->translatable()->col(6);
-                    $set->text('slug')
-                        ->rules('max:255')
-                        ->translatable()
-                        ->col(6)
-                        ->label($this->getSlugLabel($model));
-
-                    $channelInstance->fields($set);
-                });
-
-                $set->tab('SEO Meta')->fields(function (FieldSet $set) {
-                    $set->text('meta_keywords')->translatable()->col(6);
-                    $set->text('meta_title')->translatable()->col(6);
-                    $set->textarea('meta_description')->translatable();
-                    $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
-                    $set->boolean('meta_noindex')->label('Noindex and nofollow for robots')->translatable();
-                });
-
-                $set->tab('Options')->fields(function (FieldSet $set) {
-                    $set->text('css_class')->info('You can add multiple css classes separating them by space');
-                });
+                            $channelInstance->fields($set);
+                        });
+                    })
+                    ->add('SEO Meta', function (FieldSet $set) {
+                        $set->block(12)->fields(function (FieldSet $set) {
+                            $set->text('meta_keywords')->translatable()->col(6);
+                            $set->text('meta_title')->translatable()->col(6);
+                            $set->textarea('meta_description')->translatable();
+                            $set->file('meta_image')->rules('max:' . config('laradium.file_size', 2024));
+                            $set->boolean('meta_noindex')->label('Noindex and nofollow for robots')->translatable();
+                        });
+                    })
+                    ->add('Options', function (FieldSet $set) {
+                        $set->block(12)->fields(function (FieldSet $set) {
+                            $set->text('css_class')->info('You can add multiple css classes separating them by space');
+                        });
+                    });
             });
 
-            $set->block(3)->fields(function (FieldSet $set) use ($pages, $model) {
-                $set->languageSelect();
 
-                $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
-                $set->select2('parent_id')->options($pages)->label('Parent');
-                $set->boolean('is_active')->col(6);
-                $set->boolean('is_homepage')->col(6);
+            $set->col(3)->fields(function (FieldSet $set) use ($pages, $model) {
+                $set->block(12)->fields(function (FieldSet $set) use ($pages, $model) {
+                    $set->languageSelect();
 
-                $set->saveButtons()->fields(function (FieldSet $set) use ($model) {
-                    if ($model->exists) {
-                        $set->link('Preview', 'javascript:;')->attr([
-                            'id'         => 'preview-page',
-                            'class'      => 'btn btn-primary mb-1 ml-1',
-                            'target'     => '_blank',
-                            'data-links' => json_encode($this->getPageLinks($model))
-                        ]);
+                    $set->select('layout')->options(config('laradium-content.layouts', ['layouts.main' => 'Main']));
+                    $set->select2('parent_id')->options($pages)->label('Parent');
+                    $set->boolean('is_active')->col(6);
+                    $set->boolean('is_homepage')->col(6);
 
-                        $set->customContent('<button class="btn btn-primary mb-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
-                                $model) . '">Duplicate</button>')->attributes([
-                            'style' => 'display: inline-block;'
-                        ]);
-                    }
-                })->withoutLanguageSelect();
-            })->attributes([
-                'id' => 'page-sidebar'
-            ]);
+                    $set->saveButtons()->fields(function (FieldSet $set) use ($model) {
+                        if ($model->exists) {
+                            $set->link('Preview', 'javascript:;')->attributes([
+                                'id'         => 'preview-page',
+                                'class'      => 'btn btn-primary mb-1 ml-1',
+                                'target'     => '_blank',
+                                'data-links' => json_encode($this->getPageLinks($model))
+                            ]);
+
+                            $set->customContent('<button class="btn btn-primary mb-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
+                                    $model) . '">Duplicate</button>')->attributes([
+                                'style' => 'display: inline-block;'
+                            ]);
+                        }
+                    })->withoutLanguageSelect();
+                })->attributes([
+                    'id' => 'page-sidebar'
+                ]);
+            });
+
         })->js([
             versionedAsset('laradium/assets/js/page.js')
         ]);
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Table
+     * @return Table
      */
     public function table()
     {
@@ -131,16 +146,16 @@ class PageResource extends AbstractResource
                         'item'   => $item,
                         'column' => 'slug'
                     ])->render();
-                })->notSortable()->notSearchable();
+                })->notSortable()->notSearchable()->raw();
             } else {
-                $column->add('slug')->translatable();
+                $column->add('slug')->translatable()->raw();
             }
 
             $column->add('seo_optimized')->modify(function ($item) {
                 return $this->checkSeoStatus($item);
-            })->notSortable()->notSearchable();
+            })->notSortable()->notSearchable()->raw();
 
-            $column->add('is_active', 'Is Visible?')->switchable();
+            $column->add('is_active', 'Is Visible?')->switchable()->raw();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
@@ -343,7 +358,8 @@ class PageResource extends AbstractResource
             if ($translation->slug) {
                 $links[] = [
                     'iso_code' => $language->iso_code,
-                    'url'      => config('laradium-content.page_preview_url', url('/')) . '/' . ($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug) . '?preview=true'
+                    'url'      => config('laradium-content.page_preview_url',
+                            url('/')) . '/' . ($prependLocale ? $language->iso_code . '/' . $preSlug . $translation->slug : $preSlug . $translation->slug) . '?preview=true'
                 ];
             }
         }
