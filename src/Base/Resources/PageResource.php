@@ -109,9 +109,9 @@ class PageResource extends AbstractResource
 
                     $set->saveButtons()->fields(function (FieldSet $set) use ($model) {
                         if ($model->exists) {
-                            $set->link('Preview', 'javascript:;')->attributes([
+                            $set->link('Preview', 'javascript:;')->attr([
                                 'id'         => 'preview-page',
-                                'class'      => 'btn btn-primary mb-1 ml-1',
+                                'class'      => 'btn btn-primary mb-1 mr-1',
                                 'target'     => '_blank',
                                 'data-links' => json_encode($this->getPageLinks($model))
                             ]);
