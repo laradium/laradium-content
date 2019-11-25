@@ -146,16 +146,16 @@ class PageResource extends AbstractResource
                         'item'   => $item,
                         'column' => 'slug'
                     ])->render();
-                })->notSortable()->notSearchable()->raw();
+                })->notSortable()->notSearchable();
             } else {
-                $column->add('slug')->translatable()->raw();
+                $column->add('slug')->translatable();
             }
 
             $column->add('seo_optimized')->modify(function ($item) {
                 return $this->checkSeoStatus($item);
-            })->notSortable()->notSearchable()->raw();
+            })->notSortable()->notSearchable();
 
-            $column->add('is_active', 'Is Visible?')->switchable()->raw();
+            $column->add('is_active', 'Is Visible?')->switchable();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
