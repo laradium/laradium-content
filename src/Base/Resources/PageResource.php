@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Content\Base\Resources;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
@@ -48,6 +49,40 @@ class PageResource extends AbstractResource
         parent::__construct();
 
         $this->channelRegistry = app(ChannelRegistry::class);
+    }
+
+    /**
+     * @return View
+     */
+    public function index()
+    {
+        $this->builder->components(function (FieldSet $set) {
+            $set->col(12)->fields(function (FieldSet $set) {
+                $set->breadcrumbs($this->getBreadcrumbs('index'));
+            });
+
+            $set->block(12)->fields(function (FieldSet $set) {
+                $set->customContent(function () {
+                    return view('laradium-content::admin.pages.index-top', [
+                        'resource' => $this,
+                    ], [
+                        'channels' => $this->channelRegistry->all()
+                    ])->render();
+                });
+
+                $set->table($this->table()
+                    ->url($this->getAction('data-table'))
+                    ->toggleUrl($this->getAction('toggle'))
+                    ->make($this->addActionColumn())
+                );
+            });
+        });
+
+        return view($this->layout->getView('index'), [
+            'resource' => $this,
+            'builder'  => $this->builder,
+            'layout'   => $this->layout
+        ]);
     }
 
     /**
@@ -153,9 +188,9 @@ class PageResource extends AbstractResource
 
             $column->add('seo_optimized')->modify(function ($item) {
                 return $this->checkSeoStatus($item);
-            })->notSortable()->notSearchable();
+            })->notSortable()->notSearchable()->raw();
 
-            $column->add('is_active', 'Is Visible?')->switchable();
+            $column->add('is_active', 'Is Visible?')->switchable()->raw();
             $column->add('content_type', 'Type')->modify(function ($item) {
                 if ($item->content_type) {
                     return array_last(explode('\\', $item->content_type));
@@ -163,10 +198,7 @@ class PageResource extends AbstractResource
 
                 return 'Main';
             });
-        })
-            ->additionalView('laradium-content::admin.pages.index-top', [
-                'channels' => $this->channelRegistry->all()
-            ]);
+        });
     }
 
     /**
@@ -233,10 +265,10 @@ class PageResource extends AbstractResource
     private function getPages(): array
     {
         $pages = [null => '-- Select --'];
-        $pageLsit = Page::where('id', '!=', $this->getModel()->id)->get()->mapWithKeys(function ($page) {
+        $pageList = Page::where('id', '!=', $this->getModel()->id)->get()->mapWithKeys(function ($page) {
             return [(string)$page->id => $page->title];
         })->toArray();
-        $pages += $pageLsit;
+        $pages += $pageList;
 
         return $pages;
     }
