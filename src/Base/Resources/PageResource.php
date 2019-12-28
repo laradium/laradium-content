@@ -181,7 +181,7 @@ class PageResource extends AbstractResource
                         'item'   => $item,
                         'column' => 'slug'
                     ])->render();
-                })->notSortable()->notSearchable();
+                })->notSortable()->notSearchable()->raw();
             } else {
                 $column->add('slug')->translatable();
             }

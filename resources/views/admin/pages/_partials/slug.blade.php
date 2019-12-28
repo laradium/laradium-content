@@ -6,7 +6,7 @@
     @php
         $translation = $item->translations->where('locale', $language->iso_code)->first();
     @endphp
-    @if($translation->{$column})
+    @if($translation && $translation->{$column})
         <li>
             @php
                 $preSlug = '';
