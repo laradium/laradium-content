@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Content\Base\Resources;
 
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -199,6 +200,18 @@ class PageResource extends AbstractResource
                 return 'Main';
             });
         });
+    }
+
+    /**
+     * @return Factory|View
+     */
+    public function create()
+    {
+        return view($this->getView('create'), [
+            'resource' => $this,
+            'layout'   => $this->layout,
+            'builder'  => $this->formBuilder($this->getAction('store') . '?channel=' . request()->get('channel', 'main'))
+        ]);
     }
 
     /**
