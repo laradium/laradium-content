@@ -152,10 +152,12 @@ class PageResource extends AbstractResource
                                 'data-links' => json_encode($this->getPageLinks($model))
                             ]);
 
-                            $set->customContent('<button class="btn btn-primary mb-1" id="duplicate-page" data-url="' . route('admin.pages.duplicate',
-                                    $model) . '">Duplicate</button>')->attributes([
-                                'style' => 'display: inline-block;'
-                            ]);
+                            $set->link('Duplicate', 'javascript:;')
+                                ->attr([
+                                    'id'       => 'duplicate-page',
+                                    'class'    => 'btn btn-primary mb-1 mr-1',
+                                    'data-url' => route('admin.pages.duplicate', $model)
+                                ]);
                         }
                     })->withoutLanguageSelect();
                 })->attributes([
@@ -218,58 +220,15 @@ class PageResource extends AbstractResource
      * @param Request $request
      * @param Page $page
      * @return JsonResponse
-     * @throws ReflectionException
      */
     public function duplicate(Request $request, Page $page): JsonResponse
     {
-        $data = $request->all();
-        foreach ($data['translations'] as $locale => $translations) {
-            if ($translations['title']) {
-                $data['translations'][$locale]['title'] = $translations['title'] . ' copy';
-            }
-
-            if ($translations['slug']) {
-                $data['translations'][$locale]['slug'] = $translations['slug'] . '-copy';
-            }
-
-            $data['is_active'] = false;
-        }
-
-
-        $this->recursiveUnsetIds($data);
-        $this->model(new Page());
-
-        $model = $this->saveData($data, $this->getModel());
-
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'redirect_to' => route('admin.pages.edit', $model)
-            ]
-        ]);
-    }
-
-    /**
-     * @param $array
-     * @return bool
-     */
-    private function recursiveUnsetIds(&$array): bool
-    {
-        foreach ($array as $index => &$value) {
-            if (in_array($index, ['id']) && !is_numeric($index)) {
-                unset($array[$index]);
-            }
-
-            if (is_array($value)) {
-                if (array_get($value, 'remove', null)) {
-                    unset($array[$index]);
-                }
-
-                $this->recursiveUnsetIds($value, ['id']);
-            }
-        }
-
-        return true;
+        return $this->getForm()
+            ->model(new Page)
+            ->redirectTo(function ($model) {
+                return $this->getAction('edit', $model->id);
+            })
+            ->duplicate($request);
     }
 
     /**
